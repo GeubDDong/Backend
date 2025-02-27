@@ -1,0 +1,50 @@
+name: AutoDeploy NestJS App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install --omit=dev
+
+      - name: Run Tests
+        run: npm test
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t my-nest-app .
+          docker tag my-nest-app my-dockerhub-username/my-nest-app:latest
+          docker push my-dockerhub-username/my-nest-app:latest
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull my-dockerhub-username/my-nest-app:latest
+            docker stop nest-app || true
+            docker rm nest-app || true
+            docker run -d --name nest-app -p 3000:3000 --env-file /home/ubuntu/.env my-dockerhub-username/my-nest-app:latest
