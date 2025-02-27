@@ -1,4 +1,4 @@
-name: AutoDeploy NestJS App
+name: Auto-Deploy NestJS App
 
 on:
   push:
