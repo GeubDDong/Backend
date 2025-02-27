@@ -1,4 +1,4 @@
-name: Auto-Deploy NestJS App
+name: CI - Run Tests on Main Branch
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,34 +22,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      # ❌ Jest 실행 제거 (테스트가 필요하면 주석 해제 후 사용)
-      # - name: Run Tests
-      #   run: npm test -- --passWithNoTests
+      - name: Run Tests
+        run: npm test -- --passWithNoTests
 
       - name: Build Project
         run: npm run build
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
-        run: |
-          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin || exit 1
-
-      - name: Build and Push Docker Image
-        run: |
-          docker build -t kinyura/geubddong .
-          docker tag kinyura/geubddong kinyura/geubddong:latest
-          docker push kinyura/geubddong:latest
-
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            docker pull kinyura/geubddong:latest
-            docker stop nest-app || true
-            docker rm nest-app || true
-            docker run -d --name nest-app -p 3000:3000 --env-file /home/ubuntu/.env kinyura/geubddong:latest
