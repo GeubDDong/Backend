@@ -25,7 +25,7 @@ export class DetailToiletService {
       disabled_male: toiletInfo.disabled_male > 0 ? 'Y' : 'N',
       kids_toilet_male: toiletInfo.kids_toilet_male > 0 ? 'Y' : 'N',
       disabled_female: toiletInfo.disabled_female > 0 ? 'Y' : 'N',
-      kids_toilet_female: toiletInfo.kids_toilet_femaie > 0 ? 'Y' : 'N',
+      kids_toilet_female: toiletInfo.kids_toilet_female > 0 ? 'Y' : 'N',
     };
   }
 }

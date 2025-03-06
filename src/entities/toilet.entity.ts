@@ -24,7 +24,7 @@ export class ToiletModel {
   disabled_female: number;
 
   @Column({ type: 'int' })
-  kids_toilet_femaie: number;
+  kids_toilet_female: number;
 
   @Column({ type: 'varchar', length: 100 })
   management_agency: string;
