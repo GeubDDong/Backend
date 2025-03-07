@@ -6,7 +6,7 @@ export class DetailToiletController {
   constructor(private readonly detailToiletService: DetailToiletService) {}
 
   @Get(':id')
-  getDetailToilet(@Param() id: string) {
+  getDetailToilet(@Param('id') id: string) {
     return this.detailToiletService.getDetailInfo(+id);
   }
 }
