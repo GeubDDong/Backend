@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserToiletCommentModel } from './user.toilet.comment.entity';
+import { LikesModel } from './likes.entity';
 
 @Entity()
 export class ToiletModel {
@@ -52,4 +54,10 @@ export class ToiletModel {
 
   @Column({ type: 'date' })
   data_reference_date: Date;
+
+  @OneToMany(() => UserToiletCommentModel, (comment) => comment.toilet)
+  comments: UserToiletCommentModel[];
+
+  @OneToMany(() => LikesModel, (like) => like.toilet_id)
+  likes: LikesModel[];
 }
