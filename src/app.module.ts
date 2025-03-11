@@ -6,6 +6,10 @@ import { LikesModule } from './module/likes.module';
 import { AuthModule } from './module/auth.module';
 import { UserToiletCommentModule } from './module/user.toilet.comment.module';
 import { UsersModule } from './module/users.module';
+import { ToiletUploadService } from './service/toilet-upload.service';
+import { ToiletUploadController } from './controller/toilet-upload.controller';
+import { RedisModule } from './configs/redis.module';
+import { RedisService } from './service/redis.service';
 
 @Module({
   imports: [
