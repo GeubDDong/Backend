@@ -18,7 +18,7 @@ export class UsersService {
   async findOne(id: number) {
     return this.usersRepository.findOne({
       where: { id },
-      select: ['id', 'refresh_token'],
+      select: ['email', 'id', 'refresh_token'],
     });
   }
 

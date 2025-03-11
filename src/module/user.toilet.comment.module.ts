@@ -9,10 +9,12 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import jwtConfig from 'src/configs/auth/jwt.config';
 import { AuthModule } from './auth.module';
+import { UsersModel } from 'src/entities/users.entity';
+import { ToiletModel } from 'src/entities/toilet.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserToiletCommentModel]),
+    TypeOrmModule.forFeature([UserToiletCommentModel, UsersModel, ToiletModel]),
     ConfigModule.forFeature(jwtConfig),
     AuthModule,
   ],
@@ -25,5 +27,6 @@ import { AuthModule } from './auth.module';
       useClass: JwtAuthGuard,
     },
   ],
+  exports: [UserToiletCommentService],
 })
 export class UserToiletCommentModule {}

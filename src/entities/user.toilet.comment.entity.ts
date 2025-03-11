@@ -25,7 +25,7 @@ export class UserToiletCommentModel {
   updated_at: Date;
 
   @ManyToOne(() => UsersModel, (user) => user.comments, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_email' })
+  @JoinColumn({ name: 'user_email', referencedColumnName: 'email' })
   user: UsersModel;
 
   @ManyToOne(() => ToiletModel, (toilet) => toilet.comments, {

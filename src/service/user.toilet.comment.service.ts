@@ -9,6 +9,9 @@ export class UserToiletCommentService {
   constructor(
     @InjectRepository(UserToiletCommentModel)
     private readonly commentRepository: Repository<UserToiletCommentModel>,
+
+    @InjectRepository(UsersModel)
+    private readonly usersRepository: Repository<UsersModel>,
   ) {}
 
   // 댓글 조회 (비로그인)
@@ -51,16 +54,21 @@ export class UserToiletCommentService {
       })),
     };
   }
-}
+  // 댓글 등록
+  async addComment(
+    toiletId: number,
+    email: string,
+    comment: string,
+  ): Promise<any> {
+    const newComment = this.commentRepository.create({
+      toilet: { id: toiletId },
+      user: { email: email },
+      comment: comment,
+    });
 
-// 댓글 등록
-//   async addComment(
-//     id: number,
-//     email: string,
-//     comment: string,
-//   ): Promise<UserToiletCommentModel> {
-//     return this.commentRepository.save(comment);
-//   }
+    return await this.commentRepository.save(newComment);
+  }
+}
 
 // 댓글 수정
 //   async updateComment() //     id: number,
