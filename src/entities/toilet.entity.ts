@@ -10,10 +10,10 @@ export class ToiletModel {
   @Column({ type: 'varchar', length: 50 })
   name: string;
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   street_address: string;
 
-  @Column({ type: 'varchar', length: 150 })
+  @Column({ type: 'varchar', length: 150, nullable: true })
   lot_address: string;
 
   @Column({ type: 'int' })
