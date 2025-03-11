@@ -22,6 +22,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth/jwt-auth.guard';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
     ConfigModule.forFeature(kakaoOauthConfig),
+    AuthModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -32,8 +33,9 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth/jwt-auth.guard';
     RefreshJwtStrategy,
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard, //@UseGuards(JwtAuthGuard) applied on all API endppints
+      useClass: JwtAuthGuard,
     },
   ],
+  exports: [AuthService, UsersService],
 })
 export class AuthModule {}
