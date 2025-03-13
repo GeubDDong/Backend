@@ -13,8 +13,8 @@ export class UsersModel {
   @PrimaryColumn({ type: 'varchar', length: 200 })
   email: string;
 
-  @Column({ type: 'bigint' })
-  id: number;
+  @Column()
+  id: string;
 
   @Column({ type: 'varchar', length: 30 })
   username: string;
