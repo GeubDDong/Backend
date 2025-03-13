@@ -1,7 +1,63 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { UserToiletCommentModel } from './user.toilet.comment.entity';
+import { LikesModel } from './likes.entity';
 
-@Entity('Connect')
-export class Connect extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: 'int' })
+@Entity()
+export class ToiletModel {
+  @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'varchar', length: 50 })
+  name: string;
+
+  @Column({ type: 'varchar', length: 150, nullable: true })
+  street_address: string;
+
+  @Column({ type: 'varchar', length: 150, nullable: true })
+  lot_address: string;
+
+  @Column({ type: 'int' })
+  disabled_male: number;
+
+  @Column({ type: 'int' })
+  kids_toilet_male: number;
+
+  @Column({ type: 'int' })
+  disabled_female: number;
+
+  @Column({ type: 'int' })
+  kids_toilet_female: number;
+
+  @Column({ type: 'varchar', length: 100 })
+  management_agency: string;
+
+  @Column({ type: 'varchar', length: 20 })
+  phone_number: string;
+
+  @Column({ type: 'varchar', length: 50, default: '정보없음' })
+  open_hour: string;
+
+  @Column({ type: 'float8' })
+  latitude: number;
+
+  @Column({ type: 'float8' })
+  longitude: number;
+
+  @Column({ type: 'char', length: 1 })
+  emergency_bell: string;
+
+  @Column({ type: 'char', length: 1 })
+  cctv: string;
+
+  @Column({ type: 'char', length: 1 })
+  diaper_changing_station: string;
+
+  @Column({ type: 'date' })
+  data_reference_date: Date;
+
+  @OneToMany(() => UserToiletCommentModel, (comment) => comment.toilet)
+  comments: UserToiletCommentModel[];
+
+  @OneToMany(() => LikesModel, (like) => like.toilet)
+  likes: LikesModel[];
 }
