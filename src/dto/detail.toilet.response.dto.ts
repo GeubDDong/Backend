@@ -1,3 +1,5 @@
+import { ToiletModel } from 'src/entity/toilet.entity';
+
 export class DetailToiletResponseDto {
   id: number;
   name: string;
@@ -16,4 +18,13 @@ export class DetailToiletResponseDto {
   cctv: string;
   diaper_changing_station: string;
   data_reference_date: Date;
+
+  constructor(toiletInfo: ToiletModel) {
+    Object.assign(this, toiletInfo);
+
+    this.disabled_male = toiletInfo.disabled_male > 0 ? 'Y' : 'N';
+    this.kids_toilet_male = toiletInfo.kids_toilet_male > 0 ? 'Y' : 'N';
+    this.disabled_female = toiletInfo.disabled_female > 0 ? 'Y' : 'N';
+    this.kids_toilet_female = toiletInfo.kids_toilet_female > 0 ? 'Y' : 'N';
+  }
 }
