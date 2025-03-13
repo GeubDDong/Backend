@@ -35,7 +35,7 @@ export class UserToiletCommentController {
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const { id } = req.user;
+    const id = String(req.user.id);
 
     return this.userToiletCommentService.getComments(toiletId, id);
   }
@@ -53,43 +53,38 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.addComment(toiletId, email, comment);
 
-    return { message: 'success' };
+    return { statusCode: 201, message: 'success' };
   }
 
   // 댓글 수정
-  @Put(':toiletId/:commentId')
+  @Put(':toiletId')
   @HttpCode(200)
   async updateComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Param('commentId', ParseIntPipe) commentId: number,
-    @Body() body: { comment: string },
+    @Body() body: { id: number; comment: string },
     @Req() req: Request,
   ) {
     const { email } = req.user;
-    const { comment } = body;
-    return;
-    // this.userToiletCommentService.updateComment(
-    //   toiletId,
-    //   commentId,
-    //   email,
-    //   comment,
-    // );
+    const { id, comment } = body;
+
+    await this.userToiletCommentService.updateComment(email, id, comment);
+
+    return { statusCode: 200, message: 'success' };
   }
 
   // 댓글 삭제
-
-  @Delete(':toiletId/:commentId')
+  @Delete(':toiletId')
+  @HttpCode(200)
   async deleteComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body() body: { id: number },
     @Req() req: Request,
   ) {
     const { email } = req.user;
-    return;
-    // this.userToiletCommentService.deleteComment(
-    //   toiletId,
-    //   commentId,
-    //   email,
-    // );
+    const { id } = body;
+
+    await this.userToiletCommentService.deleteComment(email, id, toiletId);
+
+    return { statusbar: 200, message: 'success' };
   }
 }
