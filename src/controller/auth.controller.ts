@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Header,
@@ -7,11 +8,14 @@ import {
   Req,
   Res,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from '../service/auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Request, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 import { Public } from 'src/decorators/public.decorator';
+import { SetNicknameDto } from 'src/dto/set.nickname.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -43,49 +47,64 @@ export class AuthController {
   @Get('kakao-callback')
   @UseGuards(AuthGuard('kakao'))
   @HttpCode(301)
-  async kakaoLogin(@Req() req: Request, @Res() res: Response) {
+  async kakaoLogin(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const user = req.user;
+    const userId = String(user.id);
 
-    const { accessToken, refreshToken } = await this.authService.getStoreTokens(
-      user.id,
-    );
+    const { accessToken, refreshToken } =
+      await this.authService.getStoreTokens(userId);
 
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false });
+    const cookieOptions: CookieOptions = { httpOnly: true, secure: false };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return res.status(user.isNewUser ? 201 : 200).json({
+    return {
       message: 'success',
       accessToken,
       statusCode: user.isNewUser ? 201 : 200,
-    });
+    };
   }
 
   @Public()
   @Post('refresh')
   @UseGuards(AuthGuard('refresh-jwt'))
-  async refreshToken(@Req() req: Request, @Res() res: Response) {
-    const userId = req.user.id;
-    console.log('userId', userId);
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const userId = String(req.user.id);
+
     const accessToken = await this.authService.generateAccessToken(userId);
 
-    return res.json({ statusCode: 201, message: 'success', accessToken });
+    return { statusCode: 201, message: 'success', accessToken };
   }
 
   @Post('logout')
-  async logout(@Req() req: Request, @Res() res: Response) {
-    await this.authService.logout(req.user.id);
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const userId = req.user.id;
+
+    const { statusCode, message } = await this.authService.logout(userId);
+
     res.clearCookie('refreshToken');
-    return res.json({ statusCode: 201, message: 'Logout successful' });
+
+    return { statusCode, message };
   }
 
   @Post('nickname')
-  async setNickname(@Req() req: Request, @Res() res: Response) {
-    const { nickname } = req.body;
-    const userId = req.user.id;
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async setNickname(
+    @Req() req: Request,
+    @Body() setNicknameDto: SetNicknameDto,
+  ) {
+    const userId = String(req.user.id);
+    const { nickname } = setNicknameDto;
 
     const { statusCode, message } = await this.authService.setNickname(
       userId,
       nickname,
     );
-    return res.json({ statusCode, message });
+    return { statusCode, message };
   }
 }
