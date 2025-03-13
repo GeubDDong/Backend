@@ -34,7 +34,7 @@ export class ToiletModel {
   @Column({ type: 'varchar', length: 20 })
   phone_number: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 50, default: '정보없음' })
   open_hour: string;
 
   @Column({ type: 'float8' })
