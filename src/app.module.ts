@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeORMConfig } from './configs/typeorm.config';
-import { DetailToiletModule } from './module/detail.toilet.module';
-import { LikesModule } from './module/likes.module';
-import { AuthModule } from './module/auth.module';
-import { UserToiletCommentModule } from './module/user.toilet.comment.module';
-import { UsersModule } from './module/users.module';
-import { ToiletUploadService } from './service/toilet-upload.service';
-import { ToiletUploadController } from './controller/toilet-upload.controller';
-import { RedisModule } from './configs/redis.module';
-import { RedisService } from './service/redis.service';
+import { DetailToiletModule } from './detailToilet/detail.toilet.module';
+import { LikesModule } from './like/likes.module';
+import { AuthModule } from './auth/auth.module';
+import { UserToiletCommentModule } from './userToiletComment/user.toilet.comment.module';
+import { UsersModule } from './user/user.module';
+import { RedisModule } from './cache/redis.module';
+import { RedisService } from './cache/redis.service';
 
 @Module({
   imports: [

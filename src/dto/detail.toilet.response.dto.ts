@@ -1,4 +1,4 @@
-import { ToiletModel } from 'src/entity/toilet.entity';
+import { ToiletModel } from 'src/entitiy/toilet.entity';
 
 export class DetailToiletResponseDto {
   id: number;
