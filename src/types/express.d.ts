@@ -4,7 +4,7 @@ declare module 'express' {
   interface Request extends Req {
     user: {
       email: string;
-      id: number;
+      id: string;
       username: string;
       provider: string;
       profile_image: string;

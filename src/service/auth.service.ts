@@ -17,7 +17,7 @@ export class AuthService {
   ) {}
 
   // use in kakao-callback API
-  async getStoreTokens(userId: number) {
+  async getStoreTokens(userId: string) {
     // 고유한 userId 값으로 만든 액세스,리프레시 토큰 반환
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
@@ -31,7 +31,7 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: number) {
+  async generateTokens(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
@@ -53,21 +53,21 @@ export class AuthService {
   }
 
   // use in jwt.strategy
-  async validateUserById(userId: number) {
+  async validateUserById(userId: string) {
     const user = await this.usersService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found!');
     return user;
   }
 
   // 액세스 토큰 재발급
-  async generateAccessToken(userId: number) {
+  async generateAccessToken(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     return this.jwtService.signAsync(payload);
   }
 
   // 리프레시 토큰 검증
   // use in refresh.strategy
-  async validateRefreshToken(userId: number, refreshToken: string) {
+  async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.usersService.findOne(userId);
     if (!user || !user.refresh_token)
       throw new UnauthorizedException(
@@ -85,11 +85,14 @@ export class AuthService {
     return { id: user.id, refresh_token: user.refresh_token };
   }
 
-  async logout(userId: number) {
-    await this.usersService.updateHashedRefreshToken(userId, null);
+  async logout(userId: string) {
+    const { statusCode, message } =
+      await this.usersService.updateHashedRefreshToken(userId, null);
+
+    return { statusCode, message };
   }
 
-  async setNickname(userId: number, nickname: string) {
+  async setNickname(userId: string, nickname: string) {
     const { statusCode, message } = await this.usersService.updateNickname(
       userId,
       nickname,

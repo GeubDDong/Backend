@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/create.user.dto';
-import { UsersModel } from 'src/entities/users.entity';
+import { UsersModel } from 'src/entity/users.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class UsersService {
     return await this.usersRepository.findOne({ where: { email } });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     return this.usersRepository.findOne({
       where: { id },
       select: ['email', 'id', 'refresh_token'],
@@ -23,21 +23,26 @@ export class UsersService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    console.log('create', createUserDto);
     return await this.usersRepository.save(createUserDto);
   }
 
   async updateHashedRefreshToken(
-    userId: number,
+    userId: string,
     hashedRefreshToken: string | null,
   ) {
-    return await this.usersRepository.update(
+    const result = await this.usersRepository.update(
       { id: userId },
       { refresh_token: hashedRefreshToken },
     );
+
+    if (!result.affected || result.affected === 0) {
+      return { statusCode: 404, message: 'User not found' };
+    }
+
+    return { statusCode: 201, message: 'success' };
   }
 
-  async updateNickname(userId: number, nickname: string) {
+  async updateNickname(userId: string, nickname: string) {
     const user = await this.usersRepository.findOne({
       where: { nickname },
     });

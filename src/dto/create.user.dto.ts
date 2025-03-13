@@ -1,7 +1,7 @@
 export class CreateUserDto {
   email: string;
-  id: number;
+  id: string;
   username: string;
-  provider: string;
-  profile_image: string;
+  provider?: string;
+  profile_image?: string;
 }
