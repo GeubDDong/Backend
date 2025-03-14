@@ -8,6 +8,7 @@ import { UserToiletCommentModule } from './userToiletComment/user.toilet.comment
 import { UsersModule } from './user/user.module';
 import { RedisModule } from './cache/redis.module';
 import { RedisService } from './cache/redis.service';
+import { ExcelModule } from './excel/excel.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RedisService } from './cache/redis.service';
     AuthModule,
     UserToiletCommentModule,
     UsersModule,
+    ExcelModule,
   ],
 })
 export class AppModule {}

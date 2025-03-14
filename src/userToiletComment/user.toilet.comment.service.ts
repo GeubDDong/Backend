@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserToiletCommentModel } from 'src/entitiy/user.toilet.comment.entity';
+import { UserToiletCommentModel } from 'src/entity/user.toilet.comment.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

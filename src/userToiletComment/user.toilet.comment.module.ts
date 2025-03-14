@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserToiletCommentService } from './user.toilet.comment.service';
 import { UserToiletCommentController } from './user.toilet.comment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserToiletCommentModel } from 'src/entitiy/user.toilet.comment.entity';
+import { UserToiletCommentModel } from 'src/entity/user.toilet.comment.entity';
 import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';

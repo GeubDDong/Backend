@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { LikesController } from './likes.controller';
-import { LikesModel } from 'src/entitiy/likes.entity';
+import { LikesModel } from 'src/entity/likes.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

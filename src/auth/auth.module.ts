@@ -8,7 +8,7 @@ import jwtConfig from 'src/configs/auth/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import refreshJwtConfig from 'src/configs/auth/refresh.jwt.config';
 import { UsersService } from 'src/user/user.service';
-import { UsersModel } from 'src/entitiy/user.entity';
+import { UsersModel } from 'src/entity/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { RefreshJwtStrategy } from 'src/util/strategy/refresh.strategy';

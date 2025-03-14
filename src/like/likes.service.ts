@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LikesModel } from 'src/entitiy/likes.entity';
-import { UsersModel } from 'src/entitiy/user.entity';
+import { LikesModel } from 'src/entity/likes.entity';
+import { UsersModel } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
