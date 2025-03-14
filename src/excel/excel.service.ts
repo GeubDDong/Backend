@@ -20,26 +20,24 @@ export class ExcelService {
       const rawData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
       const toilets = rawData.map((row: any) => ({
-        name: row['화장실명'] || '알 수 없음',
-        street_address: row['소재지도로명주소'] || '알 수 없음',
-        lot_address: row['소재지지번주소'] || '알 수 없음',
+        name: row['화장실명'] || '상시 개방',
+        street_address: row['소재지도로명주소'] || '상시 개방',
+        lot_address: row['소재지지번주소'] || '상시 개방',
         disabled_male: row['남성용-장애인용대변기수'] ?? 0,
         kids_toilet_male: row['남성용-어린이용대변기수'] ?? 0,
         disabled_female: row['여성용-장애인용대변기수'] ?? 0,
         kids_toilet_female: row['여성용-어린이용대변기수'] ?? 0,
-        management_agency: row['관리기관명'] || '정보 없음',
+        management_agency: row['관리기관명'] || '상시 개방',
         phone_number: row['전화번호']
           ? row['전화번호'].toString()
-          : '정보 없음',
-        open_hour:
-          this.convertToStandardOpenHourFormat(row['개방시간상세']) ||
-          '정보 없음',
+          : '상시 개방',
+        open_hour: this.convertToStandardOpenHourFormat(row['개방시간상세']),
         latitude: row['WGS84위도'] ? parseFloat(row['WGS84위도']) : undefined,
         longitude: row['WGS84경도'] ? parseFloat(row['WGS84경도']) : undefined,
-        emergency_bell: row['비상벨설치여부'] || '정보 없음',
-        cctv: row['화장실입구CCTV설치유무'] || '정보 없음',
-        diaper_changing_station: row['기저귀교환대유무'] || '정보 없음',
-        data_reference_date: row['데이터기준일자'] || '정보 없음',
+        emergency_bell: row['비상벨설치여부'] || '상시 개방',
+        cctv: row['화장실입구CCTV설치유무'] || '상시 개방',
+        diaper_changing_station: row['기저귀교환대유무'] || '상시 개방',
+        data_reference_date: row['데이터기준일자'] || '상시 개방',
       }));
 
       try {
@@ -47,20 +45,16 @@ export class ExcelService {
         for (let i = 0; i < toilets.length; i += chunkSize) {
           const chunk = toilets.slice(i, i + chunkSize);
           await this.toiletRepository.save(chunk);
-          console.log(`${i + chunk.length}개 저장 완료`);
         }
-      } catch (error) {
-        console.log(error);
-        throw error;
+      } finally {
+        fs.unlinkSync(file.path);
       }
-
-      fs.unlinkSync(file.path);
     }
   }
 
   private convertToStandardOpenHourFormat(timeStr: string): string {
     if (!timeStr || typeof timeStr !== 'string') {
-      return '정보 없음';
+      return '상시 개방';
     }
 
     const alwaysOpenKeywords = [
@@ -82,25 +76,19 @@ export class ExcelService {
 
     const timeRange = timeStr.split('~').map((t) => t.trim());
     if (timeRange.length !== 2) {
-      return '정보 없음';
+      return '상시 개방';
     }
 
     const startTime = moment(timeRange[0], ['HH:mm', 'h:mm A']);
     const endTime = moment(timeRange[1], ['HH:mm', 'h:mm A']);
 
     if (!startTime.isValid() || !endTime.isValid()) {
-      return '정보 없음';
+      return '상시 개방';
     }
 
-    const formattedStartTime = startTime
+    return `${startTime.format('A h시').replace('AM', '오전').replace('PM', '오후')} ~ ${endTime
       .format('A h시')
       .replace('AM', '오전')
-      .replace('PM', '오후');
-    const formattedEndTime = endTime
-      .format('A h시')
-      .replace('AM', '오전')
-      .replace('PM', '오후');
-
-    return `${formattedStartTime} ~ ${formattedEndTime}`;
+      .replace('PM', '오후')}`;
   }
 }
