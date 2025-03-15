@@ -24,12 +24,10 @@ export class RefreshJwtStrategy extends PassportStrategy(
         },
       ]),
       secretOrKey: refrshJwtConfiguration.secret,
-      ignoreExpiration: false, // 만료된 토큰 거부 -> 로그인으로 돌아감
+      ignoreExpiration: false, 
       passReqToCallback: true,
     });
   }
-
-  // authorization: Bearer sldfk;lsdkf'lskald'sdkf;sdl
 
   async validate(req: Request, payload: AuthJwtPayload) {
     const userId = payload.sub;

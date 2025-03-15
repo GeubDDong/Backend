@@ -14,9 +14,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private authService: AuthService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // 요청 헤더에서 토큰 추출
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), 
       secretOrKey: jwtConfiguration.secret,
-      ignoreExpiration: false, // 만료된 토큰 거부 => 401 반환
+      ignoreExpiration: false, 
     });
   }
 
@@ -25,7 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('Invalid access token');
     }
 
-    // 사용자 정보가 존재하는지 검증
     const user = await this.authService.validateUserById(payload.sub);
 
     return user;

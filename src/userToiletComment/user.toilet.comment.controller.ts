@@ -20,7 +20,6 @@ export class UserToiletCommentController {
     private readonly userToiletCommentService: UserToiletCommentService,
   ) {}
 
-  // 댓글 조회 (비로그인)
   @Public()
   @Get(':toiletId/public')
   @HttpCode(200)
@@ -28,7 +27,6 @@ export class UserToiletCommentController {
     return this.userToiletCommentService.getCommentsPublic(toiletId);
   }
 
-  // 댓글 조회 (로그인)
   @Get(':toiletId')
   @HttpCode(200)
   async getComments(
@@ -40,7 +38,6 @@ export class UserToiletCommentController {
     return this.userToiletCommentService.getComments(toiletId, id);
   }
 
-  // 댓글 등록
   @Post(':toiletId')
   @HttpCode(201)
   async addComment(
@@ -56,7 +53,6 @@ export class UserToiletCommentController {
     return { statusCode: 201, message: 'success' };
   }
 
-  // 댓글 수정
   @Put(':toiletId')
   @HttpCode(200)
   async updateComment(
@@ -72,7 +68,6 @@ export class UserToiletCommentController {
     return { statusCode: 200, message: 'success' };
   }
 
-  // 댓글 삭제
   @Delete(':toiletId')
   @HttpCode(200)
   async deleteComment(

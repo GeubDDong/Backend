@@ -13,7 +13,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
     private readonly authService: AuthService,
   ) {
     super({
-      // POST /oauth/token
       clientID: kakaoConfiguration.clientID,
       clientSecret: kakaoConfiguration.clientSecret,
       callbackURL: kakaoConfiguration.callbackURL,

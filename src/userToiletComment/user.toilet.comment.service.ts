@@ -10,7 +10,6 @@ export class UserToiletCommentService {
     private readonly commentRepository: Repository<UserToiletCommentModel>,
   ) {}
 
-  // 댓글 조회 (비로그인)
   async getCommentsPublic(toiletId: number): Promise<any> {
     const comments = await this.commentRepository.find({
       where: { toilet: { id: toiletId } },
@@ -33,7 +32,6 @@ export class UserToiletCommentService {
     };
   }
 
-  // 댓글 조회 (로그인)
   async getComments(id: number, userId: string): Promise<any> {
     const comments = await this.commentRepository.find({
       where: { toilet: { id } },
@@ -56,7 +54,7 @@ export class UserToiletCommentService {
       })),
     };
   }
-  // 댓글 등록
+
   async addComment(
     toiletId: number,
     email: string,
@@ -71,7 +69,6 @@ export class UserToiletCommentService {
     return await this.commentRepository.save(newComment);
   }
 
-  // 댓글 수정
   async updateComment(
     email: string,
     id: number,
@@ -90,7 +87,6 @@ export class UserToiletCommentService {
     return this.commentRepository.save(existingComment);
   }
 
-  // 댓글 삭제
   async deleteComment(
     email: string,
     id: number,
