@@ -50,7 +50,7 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.addComment(toiletId, email, comment);
 
-    return { statusCode: 201, message: 'success' };
+    return { statusCode: 201, message: 'comment created successfully' };
   }
 
   @Put(':toiletId')
@@ -65,7 +65,7 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.updateComment(email, id, comment);
 
-    return { statusCode: 200, message: 'success' };
+    return { statusCode: 200, message: 'comment updated successfully' };
   }
 
   @Delete(':toiletId')
@@ -80,6 +80,6 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.deleteComment(email, id, toiletId);
 
-    return { statusbar: 200, message: 'success' };
+    return { statusCode: 200, message: 'comment deleted successfully' };
   }
 }

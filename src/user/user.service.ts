@@ -39,7 +39,7 @@ export class UsersService {
       return { statusCode: 404, message: 'User not found' };
     }
 
-    return { statusCode: 201, message: 'success' };
+    return { statusCode: 201, message: 'logout successfully' };
   }
 
   async updateNickname(userId: string, nickname: string) {
@@ -50,13 +50,13 @@ export class UsersService {
     if (user) {
       return {
         statusCode: 409,
-        message: '이미 존재하는 닉네임입니다.',
         error: 'Conflict',
+        message: '이미 존재하는 닉네임입니다.',
       };
     }
 
     await this.usersRepository.update({ id: userId }, { nickname });
 
-    return { statusCode: 201, message: 'success generateNickname' };
+    return { statusCode: 201, message: 'nickname created successfully' };
   }
 }

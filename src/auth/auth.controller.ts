@@ -61,9 +61,9 @@ export class AuthController {
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
     return {
-      message: 'success',
-      accessToken,
       statusCode: user.isNewUser ? 201 : 200,
+      message: 'login successfully',
+      accessToken,
     };
   }
 
@@ -78,7 +78,11 @@ export class AuthController {
 
     const accessToken = await this.authService.generateAccessToken(userId);
 
-    return { statusCode: 201, message: 'success', accessToken };
+    return {
+      statusCode: 201,
+      message: 'access token refreshed successfully',
+      accessToken,
+    };
   }
 
   @Post('logout')

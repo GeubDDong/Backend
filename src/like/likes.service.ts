@@ -32,7 +32,10 @@ export class LikesService {
       return { like: false, count: totalLikes };
     }
 
-    return { like: true, count: totalLikes };
+    return {
+      like: true,
+      count: totalLikes,
+    };
   }
 
   async addLike(email: string, toiletId: number) {
@@ -55,7 +58,12 @@ export class LikesService {
       where: { toilet: { id: toiletId } },
     });
 
-    return { like: true, count: totalLikes, message: '좋아요 추가되었습니다.' };
+    return {
+      statusCode: 201,
+      message: 'like created successfully',
+      like: true,
+      count: totalLikes,
+    };
   }
 
   async deleteLike(email: string, toiletId: number) {
@@ -79,9 +87,10 @@ export class LikesService {
     });
 
     return {
+      statusCode: 201,
+      message: 'like deleted successfully',
       like: false,
       count: totalLikes,
-      message: '좋아요 삭제되었습니다.',
     };
   }
 }
