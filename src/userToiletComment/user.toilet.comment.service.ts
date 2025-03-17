@@ -79,7 +79,7 @@ export class UserToiletCommentService {
     });
 
     if (!existingComment) {
-      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException(`{id}번의 댓글을 찾을 수 없습니다.`);
     }
 
     existingComment.comment = comment;
@@ -97,7 +97,7 @@ export class UserToiletCommentService {
     });
 
     if (!existingComment) {
-      throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+      throw new NotFoundException(`{id}번의 댓글을 찾을 수 없습니다.`);
     }
 
     await this.commentRepository.delete(existingComment.id);
