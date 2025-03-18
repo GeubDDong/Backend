@@ -9,6 +9,7 @@ import { UsersModule } from './user/user.module';
 import { RedisModule } from './cache/redis.module';
 import { RedisService } from './cache/redis.service';
 import { ExcelModule } from './excel/excel.module';
+import { ToiletModule } from './toilet/toilet.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ExcelModule } from './excel/excel.module';
     UserToiletCommentModule,
     UsersModule,
     ExcelModule,
+    ToiletModule,
   ],
 })
 export class AppModule {}
