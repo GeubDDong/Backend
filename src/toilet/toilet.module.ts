@@ -5,10 +5,11 @@ import { LikesModel } from 'src/entity/likes.entity';
 import { ToiletController } from './toilet.controller';
 import { ToiletService } from './toilet.service';
 import { ToiletRepository } from './toilet.repository';
+import { LikesService } from 'src/like/likes.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ToiletModel, LikesModel])],
   controllers: [ToiletController],
-  providers: [ToiletService, ToiletRepository],
+  providers: [ToiletService, ToiletRepository, LikesService],
 })
 export class ToiletModule {}

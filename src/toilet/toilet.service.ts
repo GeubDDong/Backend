@@ -14,14 +14,20 @@ export class ToiletService {
   ) {}
 
   async getToilets(
-    latitude: number,
-    longitude: number,
+    cenLat: number,
+    cenLng: number,
+    top: number,
+    bottom: number,
+    left: number,
+    right: number,
     userEmail?: string,
   ): Promise<ToiletDto[]> {
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
       .leftJoinAndSelect('toilet.likes', 'likes')
       .loadRelationCountAndMap('toilet.likeCount', 'toilet.likes')
+      .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
+      .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
       .getMany();
 
     return await Promise.all(

@@ -12,7 +12,15 @@ export class ToiletRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findToilets(latitude: number, longitude: number, userId?: string) {
+  async findToilets(
+    cenLat: number,
+    cenLng: number,
+    top: number,
+    bottom: number,
+    left: number,
+    right: number,
+    userEmail?: string,
+  ) {
     return this.dataSource
       .createQueryBuilder()
       .select([
@@ -23,19 +31,21 @@ export class ToiletRepository {
         'toilet.street_address',
         'toilet.lot_address',
         'toilet.open_hour',
-        'ST_Distance_Sphere(toilet.longitude,toilet.latitude),point(:longitude,:latitude)) AS distance',
-        userId
-          ? 'IF(liked.id IS NOT NULL,TRUE,FALSE) AS liked'
+        'ST_DistanceSphere(ST_MakePoint(toilet.longitude, toilet.latitude), ST_MakePoint(:cenLng, :cenLat)) AS distance',
+        userEmail
+          ? 'CASE WHEN likes.user_email IS NOT NULL THEN TRUE ELSE FALSE END AS liked'
           : 'FALSE AS liked',
       ])
       .from(ToiletModel, 'toilet')
       .leftJoin(
         LikesModel,
         'likes',
-        'likes.toilet_id=toilet.id AND likes.user_id=:userId',
-        { userId },
+        'likes.toilet_id = toilet.id AND likes.user_email = :userEmail',
+        { userEmail },
       )
-      .setParameters({ latitude: latitude, longitude: longitude })
+      .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
+      .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
+      .setParameters({ cenLat, cenLng })
       .orderBy('distance', 'ASC')
       .limit(10)
       .getRawMany();
@@ -46,7 +56,7 @@ export class ToiletRepository {
       .createQueryBuilder()
       .select('COUNT(*)', 'count')
       .from(LikesModel, 'likes')
-      .where('likes.toilet_id=:toiletId', { toiletId })
+      .where('likes.toilet_id = :toiletId', { toiletId })
       .getRawOne();
 
     return result?.count ?? 0;
