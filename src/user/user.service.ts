@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/create.user.dto';
 import { UsersModel } from 'src/entity/user.entity';
@@ -36,7 +40,7 @@ export class UsersService {
     );
 
     if (!result.affected || result.affected === 0) {
-      return { statusCode: 404, message: 'User not found' };
+      throw new NotFoundException('User not found');
     }
 
     return { statusCode: 201, message: 'logout successfully' };
@@ -48,11 +52,7 @@ export class UsersService {
     });
 
     if (user) {
-      return {
-        statusCode: 409,
-        error: 'Conflict',
-        message: '이미 존재하는 닉네임입니다.',
-      };
+      throw new ConflictException('이미 존재하는 닉네임입니다.');
     }
 
     await this.usersRepository.update({ id: userId }, { nickname });

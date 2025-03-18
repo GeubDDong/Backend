@@ -53,16 +53,9 @@ export class LikesService {
 
     await this.likesRepository.save(newLike);
 
-    const totalLikes = await this.likesRepository.count({
+    return await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
     });
-
-    return {
-      statusCode: 201,
-      message: 'like created successfully',
-      like: true,
-      count: totalLikes,
-    };
   }
 
   async deleteLike(email: string, toiletId: number) {
@@ -81,15 +74,8 @@ export class LikesService {
       toilet: { id: toiletId },
     });
 
-    const totalLikes = await this.likesRepository.count({
+    return await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
     });
-
-    return {
-      statusCode: 201,
-      message: 'like deleted successfully',
-      like: false,
-      count: totalLikes,
-    };
   }
 }

@@ -42,7 +42,13 @@ export class LikesController {
   ) {
     const { email } = req.user;
 
-    return this.likesService.addLike(email, toiletId);
+    const result = await this.likesService.addLike(email, toiletId);
+
+    return {
+      statusCode: 201,
+      message: 'like created successfully',
+      count: result,
+    };
   }
 
   @Delete(':toiletId')
@@ -53,6 +59,12 @@ export class LikesController {
   ) {
     const { email } = req.user;
 
-    return this.likesService.deleteLike(email, toiletId);
+    const result = await this.likesService.deleteLike(email, toiletId);
+
+    return {
+      statusCode: 201,
+      message: 'like deleted successfully',
+      count: result,
+    };
   }
 }
