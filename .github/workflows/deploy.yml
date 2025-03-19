@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: CD - 메인 브랜치 자동 배포
 
 on:
   push:

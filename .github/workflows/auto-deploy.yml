@@ -1,4 +1,4 @@
-name: CI - Run Tests on Main Branch
+name: CI - 메인 브랜치 테스트 실행
 
 on:
   push:
