@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - main # main 브랜치에 push될 때 실행
 
 jobs:
   deploy:
@@ -15,14 +15,14 @@ jobs:
 
       - name: Add SSH Key
         run: |
-          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" | tr -d '\r' > private_key.pem
           chmod 600 private_key.pem
 
       - name: Deploy to EC2
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
             cd /home/ec2-user/Backend
-            git pull origin main  
-            docker-compose down  
-            docker-compose up -d --build
+            git pull origin main  # 최신 코드 가져오기
+            docker-compose down  # 기존 컨테이너 종료
+            docker-compose up -d --build  # 최신 코드 반영하여 컨테이너 실행
           EOF
