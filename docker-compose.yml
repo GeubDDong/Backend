@@ -1,10 +1,10 @@
-version: '3.8'
-
 services:
   backend:
     image: kinyura/geubddong
     container_name: backend-app
-    build: .
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
     ports:
       - '8080:8080'
     depends_on:
