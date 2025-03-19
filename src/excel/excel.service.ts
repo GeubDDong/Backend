@@ -1,11 +1,11 @@
+import { Express } from 'express';
 import { Injectable } from '@nestjs/common';
 import * as xlsx from 'xlsx';
 import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ToiletModel } from '../entity/toilet.entity';
-import * as moment from 'moment';
-
+import moment from 'moment';
 @Injectable()
 export class ExcelService {
   constructor(
