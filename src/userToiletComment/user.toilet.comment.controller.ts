@@ -20,7 +20,6 @@ export class UserToiletCommentController {
     private readonly userToiletCommentService: UserToiletCommentService,
   ) {}
 
-  // 댓글 조회 (비로그인)
   @Public()
   @Get(':toiletId/public')
   @HttpCode(200)
@@ -28,7 +27,6 @@ export class UserToiletCommentController {
     return this.userToiletCommentService.getCommentsPublic(toiletId);
   }
 
-  // 댓글 조회 (로그인)
   @Get(':toiletId')
   @HttpCode(200)
   async getComments(
@@ -40,7 +38,6 @@ export class UserToiletCommentController {
     return this.userToiletCommentService.getComments(toiletId, id);
   }
 
-  // 댓글 등록
   @Post(':toiletId')
   @HttpCode(201)
   async addComment(
@@ -53,10 +50,9 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.addComment(toiletId, email, comment);
 
-    return { statusCode: 201, message: 'success' };
+    return { statusCode: 201, message: 'comment created successfully' };
   }
 
-  // 댓글 수정
   @Put(':toiletId')
   @HttpCode(200)
   async updateComment(
@@ -69,10 +65,9 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.updateComment(email, id, comment);
 
-    return { statusCode: 200, message: 'success' };
+    return { statusCode: 200, message: 'comment updated successfully' };
   }
 
-  // 댓글 삭제
   @Delete(':toiletId')
   @HttpCode(200)
   async deleteComment(
@@ -85,6 +80,6 @@ export class UserToiletCommentController {
 
     await this.userToiletCommentService.deleteComment(email, id, toiletId);
 
-    return { statusbar: 200, message: 'success' };
+    return { statusCode: 200, message: 'comment deleted successfully' };
   }
 }

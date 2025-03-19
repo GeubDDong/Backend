@@ -16,7 +16,6 @@ import { Request } from 'express';
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
-  // 좋아요 조회 (비로그인)
   @Public()
   @Get(':toiletId/public')
   @HttpCode(200)
@@ -24,7 +23,6 @@ export class LikesController {
     return await this.likesService.getLikesPublic(toiletId);
   }
 
-  // // 좋아요 조회 (로그인)
   @Get(':toiletId')
   @HttpCode(200)
   async getLikes(
@@ -36,7 +34,6 @@ export class LikesController {
     return await this.likesService.getLikes(toiletId, email);
   }
 
-  // 좋아요 추가
   @Post(':toiletId')
   @HttpCode(201)
   async addLike(
@@ -45,10 +42,15 @@ export class LikesController {
   ) {
     const { email } = req.user;
 
-    return this.likesService.addLike(email, toiletId);
+    const result = await this.likesService.addLike(email, toiletId);
+
+    return {
+      statusCode: 201,
+      message: 'like created successfully',
+      count: result,
+    };
   }
 
-  // 좋아요 삭제
   @Delete(':toiletId')
   @HttpCode(200)
   async deleteLike(
@@ -57,6 +59,12 @@ export class LikesController {
   ) {
     const { email } = req.user;
 
-    return this.likesService.deleteLike(email, toiletId);
+    const result = await this.likesService.deleteLike(email, toiletId);
+
+    return {
+      statusCode: 201,
+      message: 'like deleted successfully',
+      count: result,
+    };
   }
 }

@@ -1,7 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LikesModel } from 'src/entity/likes.entity';
-import { UsersModel } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -11,7 +10,6 @@ export class LikesService {
     private readonly likesRepository: Repository<LikesModel>,
   ) {}
 
-  //좋아요 조회 (비로그인)
   async getLikesPublic(toiletId: number) {
     const likes = await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
@@ -20,7 +18,6 @@ export class LikesService {
     return { like: false, count: likes };
   }
 
-  //좋아요 조회 (로그인)
   async getLikes(toiletId: number, email: string) {
     const totalLikes = await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
@@ -34,10 +31,12 @@ export class LikesService {
       return { like: false, count: totalLikes };
     }
 
-    return { like: true, count: totalLikes };
+    return {
+      like: true,
+      count: totalLikes,
+    };
   }
 
-  // 좋아요 추가
   async addLike(email: string, toiletId: number) {
     const existingLike = await this.likesRepository.findOne({
       where: { user: { email: email }, toilet: { id: toiletId } },
@@ -54,14 +53,11 @@ export class LikesService {
 
     await this.likesRepository.save(newLike);
 
-    const totalLikes = await this.likesRepository.count({
+    return await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
     });
-
-    return { like: true, count: totalLikes, message: '좋아요 추가되었습니다.' };
   }
 
-  // 좋아요 삭제
   async deleteLike(email: string, toiletId: number) {
     const existingLike = await this.likesRepository.findOne({
       where: { user: { email: email }, toilet: { id: toiletId } },
@@ -78,14 +74,8 @@ export class LikesService {
       toilet: { id: toiletId },
     });
 
-    const totalLikes = await this.likesRepository.count({
+    return await this.likesRepository.count({
       where: { toilet: { id: toiletId } },
     });
-
-    return {
-      like: false,
-      count: totalLikes,
-      message: '좋아요 삭제되었습니다.',
-    };
   }
 }

@@ -16,9 +16,7 @@ export class AuthService {
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  // use in kakao-callback API
   async getStoreTokens(userId: string) {
-    // 고유한 userId 값으로 만든 액세스,리프레시 토큰 반환
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.usersService.updateHashedRefreshToken(
@@ -43,7 +41,6 @@ export class AuthService {
     };
   }
 
-  // use in kakao.strategy
   async validateUserByEmail(user: CreateUserDto) {
     const existUser = await this.usersService.findByEmail(user.email);
     if (existUser) return { user: existUser, isNewUser: false };
@@ -52,21 +49,17 @@ export class AuthService {
     return { user: newUser, isNewUser: true };
   }
 
-  // use in jwt.strategy
   async validateUserById(userId: string) {
     const user = await this.usersService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found!');
     return user;
   }
 
-  // 액세스 토큰 재발급
   async generateAccessToken(userId: string) {
     const payload: AuthJwtPayload = { sub: userId };
     return this.jwtService.signAsync(payload);
   }
 
-  // 리프레시 토큰 검증
-  // use in refresh.strategy
   async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.usersService.findOne(userId);
     if (!user || !user.refresh_token)
