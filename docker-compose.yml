@@ -3,7 +3,7 @@ services:
     image: kinyura/geubddong
     container_name: backend-app
     build:
-      context: ./Backend
+      context: .
       dockerfile: Dockerfile
     ports:
       - '8080:8080'
