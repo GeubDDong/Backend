@@ -28,6 +28,7 @@ async function bootstrap() {
       type: 'apiKey',
       in: 'cookie',
     })
+    .addServer("https://geubddong.com")
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
