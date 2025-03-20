@@ -43,6 +43,7 @@ export class AuthController {
   @Get('login/:provider')
   checkProvider() {}
 
+  @Public()
   @Get('kakao-callback')
   @UseGuards(AuthGuard('kakao'))
   @HttpCode(302)
