@@ -57,7 +57,7 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.getStoreTokens(userId);
 
-    const cookieOptions: CookieOptions = { httpOnly: true, secure: false };
+    const cookieOptions: CookieOptions = { httpOnly: true, secure: true };
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
     if (user.isNewUser) {
