@@ -89,15 +89,19 @@ export class UserToiletCommentService {
 
   async deleteComment(
     email: string,
-    id: number,
+    commentId: number,
     toiletId: number,
   ): Promise<void> {
     const existingComment = await this.commentRepository.findOne({
-      where: { id: id, user: { email: email }, toilet: { id: toiletId } },
+      where: {
+        id: commentId,
+        user: { email: email },
+        toilet: { id: toiletId },
+      },
     });
 
     if (!existingComment) {
-      throw new NotFoundException(`{id}번의 댓글을 찾을 수 없습니다.`);
+      throw new NotFoundException(`{commentId}번의 댓글을 찾을 수 없습니다.`);
     }
 
     await this.commentRepository.delete(existingComment.id);

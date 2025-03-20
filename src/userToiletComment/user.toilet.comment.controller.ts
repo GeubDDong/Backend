@@ -103,7 +103,7 @@ export class UserToiletCommentController {
     return { statusCode: 200, message: 'comment updated successfully' };
   }
 
-  @Delete(':toiletId')
+  @Delete(':toiletId/:commentId')
   @HttpCode(200)
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 삭제' })
@@ -119,13 +119,17 @@ export class UserToiletCommentController {
   })
   async deleteComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Body() body: { id: number },
+    @Param('commentId', ParseIntPipe) commentId: number,
+    // @Body() body: { id: number },
     @Req() req: Request,
   ) {
     const { email } = req.user;
-    const { id } = body;
 
-    await this.userToiletCommentService.deleteComment(email, id, toiletId);
+    await this.userToiletCommentService.deleteComment(
+      email,
+      commentId,
+      toiletId,
+    );
 
     return { statusCode: 200, message: 'comment deleted successfully' };
   }
