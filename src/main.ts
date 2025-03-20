@@ -15,7 +15,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   app.enableCors({
-    origin: 'http://localhost:8080',
+    origin: 'https://geubddong-deploy.vercel.app',
     credentials: true,
   });
 

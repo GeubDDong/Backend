@@ -62,12 +62,12 @@ export class AuthController {
 
     if (user.isNewUser) {
       return res.redirect(
-        `http://localhost:3000/auth/callback?accessToken=${accessToken}&flag=isNewUser`,
+        `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}&flag=isNewUser`,
       );
     }
 
     return res.redirect(
-      `http://localhost:3000/auth/callback?accessToken=${accessToken}`,
+      `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}`,
     );
   }
 
