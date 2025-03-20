@@ -2,13 +2,33 @@ import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { Public } from 'src/decorator/public.decorator';
 import { ToiletService } from './toilet.service';
 import { Request } from 'express';
+import {
+  ApiHeader,
+  ApiOperation,
+  ApiProperty,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ToiletDto } from 'src/dto/toilet.dto';
 
+@ApiTags('Toilet')
 @Controller('toilet')
 export class ToiletController {
   constructor(private readonly toiletService: ToiletService) {}
 
   @Public()
   @Get()
+  @ApiResponse({
+    status: 200,
+    description: '회원요청 (비회원 요청일 경우 liked.like:false 유지)',
+    type: ToiletDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden',
+  })
   async getToilets(
     @Query('cenLat') cenLat: number,
     @Query('cenLng') cenLng: number,
