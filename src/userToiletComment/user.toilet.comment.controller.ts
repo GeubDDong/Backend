@@ -13,7 +13,15 @@ import {
 import { UserToiletCommentService } from './user.toilet.comment.service';
 import { Public } from 'src/decorator/public.decorator';
 import { Request } from 'express';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Comments')
 @Controller('comments')
 export class UserToiletCommentController {
   constructor(
@@ -23,12 +31,15 @@ export class UserToiletCommentController {
   @Public()
   @Get(':toiletId/public')
   @HttpCode(200)
+  @ApiOperation({ summary: '댓글 조회(비로그인 유저)' })
   async getCommentsPublic(@Param('toiletId', ParseIntPipe) toiletId: number) {
     return this.userToiletCommentService.getCommentsPublic(toiletId);
   }
 
   @Get(':toiletId')
   @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '댓글 조회(로그인 유저)' })
   async getComments(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
@@ -40,6 +51,18 @@ export class UserToiletCommentController {
 
   @Post(':toiletId')
   @HttpCode(201)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '댓글 추가' })
+  @ApiResponse({
+    status: 201,
+    description: '댓글 작성 성공',
+    schema: {
+      example: {
+        statusCode: 201,
+        message: 'comment created successfully',
+      },
+    },
+  })
   async addComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Body() body: { comment: string },
@@ -55,6 +78,18 @@ export class UserToiletCommentController {
 
   @Put(':toiletId')
   @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '댓글 수정' })
+  @ApiResponse({
+    status: 200,
+    description: '댓글 수정 성공',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'comment updated successfully',
+      },
+    },
+  })
   async updateComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Body() body: { id: number; comment: string },
@@ -70,6 +105,18 @@ export class UserToiletCommentController {
 
   @Delete(':toiletId')
   @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '댓글 삭제' })
+  @ApiResponse({
+    status: 200,
+    description: '댓글 삭제 성공',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'comment deleted successfully',
+      },
+    },
+  })
   async deleteComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Body() body: { id: number },
