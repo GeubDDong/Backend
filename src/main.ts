@@ -17,6 +17,8 @@ async function bootstrap() {
   app.enableCors({
     origin: 'https://geubddong-deploy.vercel.app',
     credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
   });
 
   const config = new DocumentBuilder()
@@ -28,7 +30,7 @@ async function bootstrap() {
       type: 'apiKey',
       in: 'cookie',
     })
-    .addServer("https://geubddong.com")
+    .addServer('https://geubddong.com')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
