@@ -43,12 +43,12 @@ export class AuthController {
   @Get('login/:provider')
   checkProvider() {}
 
-  @Public()
   @Get('kakao-callback')
   @UseGuards(AuthGuard('kakao'))
-  @HttpCode(301)
+  @HttpCode(302)
   async kakaoLogin(
-    @Req() req: Request,
+    @Req()
+    req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = req.user;
@@ -60,11 +60,15 @@ export class AuthController {
     const cookieOptions: CookieOptions = { httpOnly: true, secure: false };
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return {
-      statusCode: user.isNewUser ? 201 : 200,
-      message: 'login successfully',
-      accessToken,
-    };
+    if (user.isNewUser) {
+      return res.redirect(
+        `http://localhost:3000/auth/callback?accessToken=${accessToken}&flag=isNewUser`,
+      );
+    }
+
+    return res.redirect(
+      `http://localhost:3000/auth/callback?accessToken=${accessToken}`,
+    );
   }
 
   @Public()
