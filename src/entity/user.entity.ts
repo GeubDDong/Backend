@@ -11,11 +11,11 @@ import { Favorite } from './favorite.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryColumn({ type: 'varchar' })
-  id: string;
+  @PrimaryColumn({ type: 'int' })
+  id: number;
 
   @Column({ unique: true })
-  social_id: number;
+  social_id: string;
 
   @Column({ type: 'varchar', length: 200 })
   email: string;

@@ -15,13 +15,15 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findByEmail(email: string) {
-    return await this.usersRepository.findOne({ where: { email } });
+  async findBySocialId(social_id: string) {
+    return await this.usersRepository.findOne({
+      where: { social_id: social_id },
+    });
   }
 
-  async findOne(id: string) {
+  async findOne(userId: number) {
     return this.usersRepository.findOne({
-      where: { id },
+      where: { id: userId },
       select: ['email', 'id', 'refresh_token'],
     });
   }
@@ -31,8 +33,8 @@ export class UsersService {
   }
 
   async updateHashedRefreshToken(
-    userId: string,
-    hashedRefreshToken: string | null,
+    userId: number,
+    hashedRefreshToken: string | undefined,
   ) {
     const result = await this.usersRepository.update(
       { id: userId },
@@ -46,7 +48,7 @@ export class UsersService {
     return { statusCode: 201, message: 'logout successfully' };
   }
 
-  async updateNickname(userId: string, nickname: string) {
+  async updateNickname(userId: number, nickname: string) {
     const user = await this.usersRepository.findOne({
       where: { nickname },
     });
