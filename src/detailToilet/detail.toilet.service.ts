@@ -1,19 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
 import { DetailToiletResponseDto } from 'src/dto/detail.toilet.response.dto';
-import { ToiletModel } from 'src/entity/toilet.entity';
+import { Toilet } from 'src/entity/toilet.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class DetailToiletService {
   constructor(
-    @InjectRepository(ToiletModel)
-    private readonly toiletRepository: Repository<ToiletModel>,
+    @InjectRepository(Toilet)
+    private readonly toiletRepository: Repository<Toilet>,
   ) {}
 
   async getDetailInfo(id: number): Promise<DetailToiletResponseDto> {
     const toiletInfo = await this.toiletRepository.findOne({
       where: { id: id },
+      relations: ['facility', 'management'],
     });
 
     if (!toiletInfo) {
@@ -22,6 +24,6 @@ export class DetailToiletService {
       );
     }
 
-    return new DetailToiletResponseDto(toiletInfo);
+    return plainToInstance(DetailToiletResponseDto, toiletInfo);
   }
 }
