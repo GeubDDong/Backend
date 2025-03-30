@@ -4,13 +4,13 @@ import * as xlsx from 'xlsx';
 import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ToiletModel } from '../entity/toilet.entity';
+import { Toilet } from 'src/entity/toilet.entity';
 import moment from 'moment';
 @Injectable()
 export class ExcelService {
   constructor(
-    @InjectRepository(ToiletModel)
-    private readonly toiletRepository: Repository<ToiletModel>,
+    @InjectRepository(Toilet)
+    private readonly toiletRepository: Repository<Toilet>,
   ) {}
 
   async processExcelFiles(files: Express.Multer.File[]): Promise<void> {
