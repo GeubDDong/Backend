@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UserToiletCommentService } from './user.toilet.comment.service';
-import { UserToiletCommentController } from './user.toilet.comment.controller';
+import { UserToiletCommentService } from './comment.service';
+import { UserToiletCommentController } from './comment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import {Comment}
 import { UserToiletCommentModel } from 'src/entity/user.toilet.comment.entity';
 import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';

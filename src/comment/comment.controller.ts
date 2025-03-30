@@ -10,7 +10,7 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { UserToiletCommentService } from './user.toilet.comment.service';
+import { UserToiletCommentService } from './comment.service';
 import { Public } from 'src/decorator/public.decorator';
 import { Request } from 'express';
 import {

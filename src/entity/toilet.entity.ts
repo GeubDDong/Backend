@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Management } from './management.entity';
 import { ToiletFacility } from './toilet_facility.entity';
-import { Review } from './review.entity';
+import { Comment } from './comment.entity';
 import { Favorite } from './favorite.entity';
 
 @Entity('toilets')
@@ -47,7 +47,7 @@ export class Toilet {
   avg_accessibility: number;
 
   @Column({ default: 0 })
-  review_count: number;
+  comment_count: number;
 
   @ManyToOne(() => Management, (management) => management.toilets)
   @JoinColumn({ name: 'management_id' })
@@ -58,8 +58,8 @@ export class Toilet {
   })
   facility: ToiletFacility;
 
-  @OneToMany(() => Review, (review) => review.toilet)
-  reviews: Review[];
+  @OneToMany(() => Comment, (comment) => comment.toilet)
+  comments: Comment[];
 
   @OneToMany(() => Favorite, (favorite) => favorite.toilet)
   favorites: Favorite[];

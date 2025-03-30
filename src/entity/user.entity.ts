@@ -6,7 +6,7 @@ import {
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Review } from './review.entity';
+import { Comment } from './comment.entity';
 import { Favorite } from './favorite.entity';
 
 @Entity('users')
@@ -38,8 +38,8 @@ export class User {
   @Column({ default: false })
   deleted: boolean;
 
-  @OneToMany(() => Review, (review) => review.user)
-  reviews: Review[];
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 
   @OneToMany(() => Favorite, (favorite) => favorite.user)
   favorites: Favorite[];

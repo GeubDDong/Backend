@@ -10,16 +10,16 @@ import {
 import { User } from './user.entity';
 import { Toilet } from './toilet.entity';
 
-@Entity('reviews')
-export class Review {
+@Entity('comments')
+export class Comment {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @ManyToOne(() => User, (user) => user.reviews)
+  @ManyToOne(() => User, (user) => user.comments)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Toilet, (toilet) => toilet.reviews)
+  @ManyToOne(() => Toilet, (toilet) => toilet.comments)
   @JoinColumn({ name: 'toilet_id' })
   toilet: Toilet;
 
