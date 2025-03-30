@@ -23,9 +23,13 @@ export class ExcelService {
         name: row['화장실명'] || '알 수 없음',
         street_address: row['소재지도로명주소'] || '알 수 없음',
         lot_address: row['소재지지번주소'] || '알 수 없음',
-        disabled_male: row['남성용-장애인용대변기수'] ?? 0,
+        male_toilet: row['남성용-대변기수'] ?? 0,
+        male_urinal: row['남성용-소변기수'] ?? 0,
+        disabled_male_toilet: row['남성용-장애인용대변기수'] ?? 0,
+        disabled_male_urinal: row['남성용-장애인용소변기수'] ?? 0,
         kids_toilet_male: row['남성용-어린이용대변기수'] ?? 0,
-        disabled_female: row['여성용-장애인용대변기수'] ?? 0,
+        female_toilet: row['여성용-대변기수'] ?? 0,
+        disabled_female_toilet: row['여성용-장애인용대변기수'] ?? 0,
         kids_toilet_female: row['여성용-어린이용대변기수'] ?? 0,
         management_agency: row['관리기관명'] || '알 수 없음',
         phone_number: row['전화번호']
@@ -37,7 +41,7 @@ export class ExcelService {
         emergency_bell: row['비상벨설치여부'] || '알 수 없음',
         cctv: row['화장실입구CCTV설치유무'] || '알 수 없음',
         diaper_changing_station: row['기저귀교환대유무'] || '알 수 없음',
-        data_reference_date: row['데이터기준일자'] || '알 수 없음',
+        reference_date: row['데이터기준일자'] || '알 수 없음',
       }));
 
       try {

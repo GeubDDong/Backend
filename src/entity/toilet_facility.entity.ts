@@ -24,6 +24,9 @@ export class ToiletFacility {
   disabled_male_toilet: number;
 
   @Column({ type: 'int', default: 0 })
+  disabled_male_urinal: number;
+
+  @Column({ type: 'int', default: 0 })
   kids_toilet_male: number;
 
   @Column({ type: 'int', default: 0 })
