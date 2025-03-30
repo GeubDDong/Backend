@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ToiletModel } from '../entity/toilet.entity';
+import { Toilet } from 'src/entity/toilet.entity';
 import { ToiletDto } from '../dto/toilet.dto';
 import { LikesService } from 'src/like/likes.service';
 
 @Injectable()
 export class ToiletService {
   constructor(
-    @InjectRepository(ToiletModel)
-    private readonly toiletRepository: Repository<ToiletModel>,
+    @InjectRepository(Toilet)
+    private readonly toiletRepository: Repository<Toilet>,
     private readonly likeService: LikesService,
   ) {}
 
@@ -24,20 +24,20 @@ export class ToiletService {
   ): Promise<ToiletDto[]> {
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
-      .leftJoinAndSelect('toilet.likes', 'likes')
-      .loadRelationCountAndMap('toilet.likeCount', 'toilet.likes')
+      .leftJoinAndSelect('toilet.favorites', 'favorites')
       .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
       .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
       .getMany();
 
     return await Promise.all(
       toilets.map(async (toilet) => {
-        let likeData;
+        let liked = { like: false };
+
         if (userEmail) {
-          likeData = await this.likeService.getLikes(toilet.id, userEmail);
-        } else {
-          likeData = await this.likeService.getLikesPublic(toilet.id);
+          const result = await this.likeService.getLikes(toilet.id, userEmail);
+          liked = { like: result.like };
         }
+
         return {
           id: toilet.id,
           name: toilet.name,
@@ -46,7 +46,7 @@ export class ToiletService {
           latitude: toilet.latitude,
           longitude: toilet.longitude,
           open_hours: toilet.open_hour,
-          liked: likeData,
+          liked,
           nearest: false,
         };
       }),

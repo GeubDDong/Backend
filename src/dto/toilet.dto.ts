@@ -49,7 +49,6 @@ export class ToiletDto {
   })
   liked?: {
     like: boolean;
-    count: number;
   };
 
   @ApiProperty({
