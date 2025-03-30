@@ -16,7 +16,7 @@ export class AuthService {
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  async getStoreTokens(userId: string) {
+  async getStoreTokens(userId: number) {
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.usersService.updateHashedRefreshToken(
@@ -29,8 +29,8 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: string) {
-    const payload: AuthJwtPayload = { sub: userId };
+  async generateTokens(userId: number) {
+    const payload: AuthJwtPayload = { sub: String(userId) };
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
@@ -49,18 +49,18 @@ export class AuthService {
     return { user: newUser, isNewUser: true };
   }
 
-  async validateUserById(userId: string) {
+  async validateUserById(userId: number) {
     const user = await this.usersService.findOne(userId);
     if (!user) throw new UnauthorizedException('User not found!');
     return user;
   }
 
-  async generateAccessToken(userId: string) {
-    const payload: AuthJwtPayload = { sub: userId };
+  async generateAccessToken(userId: number) {
+    const payload: AuthJwtPayload = { sub: String(userId) };
     return this.jwtService.signAsync(payload);
   }
 
-  async validateRefreshToken(userId: string, refreshToken: string) {
+  async validateRefreshToken(userId: number, refreshToken: string) {
     const user = await this.usersService.findOne(userId);
     if (!user || !user.refresh_token)
       throw new UnauthorizedException(
@@ -78,14 +78,14 @@ export class AuthService {
     return { id: user.id, refresh_token: user.refresh_token };
   }
 
-  async logout(userId: string) {
+  async logout(userId: number) {
     const { statusCode, message } =
-      await this.usersService.updateHashedRefreshToken(userId, null);
+      await this.usersService.updateHashedRefreshToken(userId, undefined);
 
     return { statusCode, message };
   }
 
-  async setNickname(userId: string, nickname: string) {
+  async setNickname(userId: number, nickname: string) {
     const { statusCode, message } = await this.usersService.updateNickname(
       userId,
       nickname,

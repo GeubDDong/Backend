@@ -15,10 +15,8 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findBySocialId(social_id: string) {
-    return await this.usersRepository.findOne({
-      where: { social_id: social_id },
-    });
+  async findByEmail(email: string): Promise<User | null> {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 
   async findOne(userId: number) {

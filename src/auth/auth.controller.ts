@@ -53,7 +53,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = req.user;
-    const userId = String(user.id);
+    const userId = Number(user.id);
 
     const { accessToken, refreshToken } =
       await this.authService.getStoreTokens(userId);
@@ -79,7 +79,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const userId = String(req.user.id);
+    const userId = Number(req.user.id);
 
     const accessToken = await this.authService.generateAccessToken(userId);
 
@@ -92,7 +92,7 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     const { statusCode, message } = await this.authService.logout(userId);
 
@@ -107,7 +107,7 @@ export class AuthController {
     @Req() req: Request,
     @Body() setNicknameDto: SetNicknameDto,
   ) {
-    const userId = String(req.user.id);
+    const userId = Number(req.user.id);
     const { nickname } = setNicknameDto;
 
     const { statusCode, message } = await this.authService.setNickname(

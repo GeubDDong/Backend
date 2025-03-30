@@ -8,7 +8,7 @@ import jwtConfig from 'src/configs/auth/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
 import refreshJwtConfig from 'src/configs/auth/refresh.jwt.config';
 import { UsersService } from 'src/user/user.service';
-import { UsersModel } from 'src/entity/user.entity';
+import { User } from '../entity/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { RefreshJwtStrategy } from 'src/util/strategy/refresh.strategy';
@@ -17,7 +17,7 @@ import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersModel]),
+    TypeOrmModule.forFeature([User]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
