@@ -14,7 +14,7 @@ export class RefreshJwtStrategy extends PassportStrategy(
 ) {
   constructor(
     @Inject(refreshJwtConfig.KEY)
-    private refrshJwtConfiguration: ConfigType<typeof refreshJwtConfig>,
+    private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>,
     private authService: AuthService,
   ) {
     super({
@@ -23,14 +23,14 @@ export class RefreshJwtStrategy extends PassportStrategy(
           return request.cookies.refreshToken;
         },
       ]),
-      secretOrKey: refrshJwtConfiguration.secret,
+      secretOrKey: refreshJwtConfiguration.secret,
       ignoreExpiration: false, 
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: AuthJwtPayload) {
-    const userId = payload.sub;
+    const userId = Number(payload.sub);
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {

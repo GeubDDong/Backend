@@ -47,16 +47,16 @@ export class ToiletFacility {
   @Column({ type: 'varchar', length: 1, default: 'N' })
   diaper_changing_station: string;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'date' })
   reference_date: Date;
 
   @OneToOne(() => Toilet, (toilet) => toilet.facility)
   @JoinColumn({ name: 'toilet_id' })
   toilet: Toilet;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'date' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: 'date' })
   updated_at: Date;
 }

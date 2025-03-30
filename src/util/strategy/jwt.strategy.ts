@@ -16,7 +16,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: jwtConfiguration.secret,
-      ignoreExpiration: false, 
+      ignoreExpiration: false,
     });
   }
 
@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('Invalid access token');
     }
 
-    const user = await this.authService.validateUserById(payload.sub);
+    const user = await this.authService.validateUserById(Number(payload.sub));
 
     return user;
   }

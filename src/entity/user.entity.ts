@@ -29,10 +29,10 @@ export class User {
   @Column({ type: 'varchar', length: 200, nullable: true })
   refresh_token: string;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'date' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: 'date' })
   updated_at: Date;
 
   @Column({ default: false })

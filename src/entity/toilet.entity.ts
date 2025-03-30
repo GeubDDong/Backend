@@ -22,19 +22,19 @@ export class Toilet {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 150, nullable: true })
   street_address: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 150, nullable: true })
   lot_address: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   latitude: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   longitude: number;
 
-  @Column()
+  @Column({ nullable: true })
   open_hour: string;
 
   @Column({ type: 'float', default: 0 })

@@ -5,7 +5,7 @@ import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Toilet } from 'src/entity/toilet.entity';
-import moment from 'moment';
+import * as moment from 'moment';
 @Injectable()
 export class ExcelService {
   constructor(

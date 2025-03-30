@@ -7,9 +7,14 @@ import { ToiletService } from './toilet.service';
 import { ToiletRepository } from './toilet.repository';
 import { LikesService } from 'src/like/likes.service';
 import { RedisModule } from 'src/cache/redis.module';
+import { UsersModule } from 'src/user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Toilet, Favorite]), RedisModule],
+  imports: [
+    TypeOrmModule.forFeature([Toilet, Favorite]),
+    RedisModule,
+    UsersModule,
+  ],
   controllers: [ToiletController],
   providers: [ToiletService, ToiletRepository, LikesService],
 })

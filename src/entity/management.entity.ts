@@ -19,10 +19,10 @@ export class Management {
   @Column({ type: 'varchar', length: 20 })
   phone_number: string;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'date' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: 'date' })
   updated_at: Date;
 
   @OneToMany(() => Toilet, (toilet) => toilet.management)

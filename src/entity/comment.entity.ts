@@ -35,9 +35,9 @@ export class Comment {
   @Column({ type: 'text', nullable: true })
   comment: string;
 
-  @CreateDateColumn({ type: 'datetime' })
+  @CreateDateColumn({ type: 'date' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'datetime' })
+  @UpdateDateColumn({ type: 'date' })
   updated_at: Date;
 }
