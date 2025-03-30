@@ -4,39 +4,43 @@ import {
   Entity,
   OneToMany,
   PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { UserToiletCommentModel } from './user.toilet.comment.entity';
-import { LikesModel } from './likes.entity';
+import { Review } from './review.entity';
+import { Favorite } from './favorite.entity';
 
-@Entity()
-export class UsersModel {
-  @PrimaryColumn({ type: 'varchar', length: 200 })
-  email: string;
-
-  @Column()
+@Entity('users')
+export class User {
+  @PrimaryColumn({ type: 'varchar' })
   id: string;
 
-  @Column({ type: 'varchar', length: 30 })
-  username: string;
+  @Column({ unique: true })
+  social_id: number;
+
+  @Column({ type: 'varchar', length: 200 })
+  email: string;
 
   @Column({ type: 'varchar', length: 30, nullable: true })
   nickname: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 10 })
   provider: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true })
-  profile_image: string;
+  refresh_token: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'datetime' })
   created_at: Date;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
-  refresh_token?: string | null;
+  @UpdateDateColumn({ type: 'datetime' })
+  updated_at: Date;
 
-  @OneToMany(() => UserToiletCommentModel, (comment) => comment.user)
-  comments: UserToiletCommentModel[];
+  @Column({ default: false })
+  deleted: boolean;
 
-  @OneToMany(() => LikesModel, (like) => like.user)
-  likes: LikesModel[];
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
 }

@@ -1,13 +1,23 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LikesModel } from 'src/entity/likes.entity';
+import { Favorite } from 'src/entity/favorite.entity';
+import { Toilet } from 'src/entity/toilet.entity';
+import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class LikesService {
   constructor(
-    @InjectRepository(LikesModel)
-    private readonly likesRepository: Repository<LikesModel>,
+    @InjectRepository(Favorite)
+    private readonly likesRepository: Repository<Favorite>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Toilet)
+    private readonly toiletRepository: Repository<Toilet>,
   ) {}
 
   async getLikesPublic(toiletId: number) {
@@ -23,23 +33,31 @@ export class LikesService {
       where: { toilet: { id: toiletId } },
     });
 
-    const user = await this.likesRepository.findOne({
-      where: { user: { email: email }, toilet: { id: toiletId } },
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
+
+    const hasLiked = await this.likesRepository.findOne({
+      where: { user: { id: user.id }, toilet: { id: toiletId } },
     });
 
-    if (!user) {
-      return { like: false, count: totalLikes };
-    }
-
     return {
-      like: true,
+      like: !!hasLiked,
       count: totalLikes,
     };
   }
 
   async addLike(email: string, toiletId: number) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    const toilet = await this.toiletRepository.findOne({
+      where: { id: toiletId },
+    });
+
+    if (!user || !toilet) {
+      throw new NotFoundException('유저 또는 화장실 정보를 찾을 수 없습니다.');
+    }
+
     const existingLike = await this.likesRepository.findOne({
-      where: { user: { email: email }, toilet: { id: toiletId } },
+      where: { user: { id: user.id }, toilet: { id: toilet.id } },
     });
 
     if (existingLike) {
@@ -47,20 +65,29 @@ export class LikesService {
     }
 
     const newLike = this.likesRepository.create({
-      user: { email: email },
-      toilet: { id: toiletId },
+      user,
+      toilet,
     });
 
     await this.likesRepository.save(newLike);
 
     return await this.likesRepository.count({
-      where: { toilet: { id: toiletId } },
+      where: { toilet: { id: toilet.id } },
     });
   }
 
   async deleteLike(email: string, toiletId: number) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    const toilet = await this.toiletRepository.findOne({
+      where: { id: toiletId },
+    });
+
+    if (!user || !toilet) {
+      throw new NotFoundException('유저 또는 화장실 정보를 찾을 수 없습니다.');
+    }
+
     const existingLike = await this.likesRepository.findOne({
-      where: { user: { email: email }, toilet: { id: toiletId } },
+      where: { user: { id: user.id }, toilet: { id: toilet.id } },
     });
 
     if (!existingLike) {
@@ -69,13 +96,10 @@ export class LikesService {
       );
     }
 
-    await this.likesRepository.delete({
-      user: { email: email },
-      toilet: { id: toiletId },
-    });
+    await this.likesRepository.remove(existingLike);
 
     return await this.likesRepository.count({
-      where: { toilet: { id: toiletId } },
+      where: { toilet: { id: toilet.id } },
     });
   }
 }
