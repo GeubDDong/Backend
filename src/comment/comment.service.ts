@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserToiletCommentModel } from 'src/entity/user.toilet.comment.entity';
+import { Comment } from 'src/entity/comment.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UserToiletCommentService {
+export class CommentService {
   constructor(
-    @InjectRepository(UserToiletCommentModel)
-    private readonly commentRepository: Repository<UserToiletCommentModel>,
+    @InjectRepository(Comment)
+    private readonly commentRepository: Repository<Comment>,
   ) {}
 
   async getCommentsPublic(toiletId: number): Promise<any> {
@@ -32,9 +32,9 @@ export class UserToiletCommentService {
     };
   }
 
-  async getComments(id: number, userId: string): Promise<any> {
+  async getComments(toiletId: number, userId: string): Promise<any> {
     const comments = await this.commentRepository.find({
-      where: { toilet: { id } },
+      where: { toilet: { id: toiletId } },
       relations: ['user'],
     });
 
@@ -50,19 +50,19 @@ export class UserToiletCommentService {
         nickname: comment.user.nickname,
         comment: comment.comment,
         updated_at: comment.updated_at,
-        isMine: comment.user.id === userId,
+        isMine: comment.user.id === Number(userId),
       })),
     };
   }
 
   async addComment(
     toiletId: number,
-    email: string,
+    userId: number,
     comment: string,
-  ): Promise<any> {
+  ): Promise<Comment> {
     const newComment = this.commentRepository.create({
       toilet: { id: toiletId },
-      user: { email: email },
+      user: { id: userId },
       comment: comment,
     });
 
@@ -70,16 +70,16 @@ export class UserToiletCommentService {
   }
 
   async updateComment(
-    email: string,
-    id: number,
+    userId: number,
+    commentId: number,
     comment: string,
-  ): Promise<UserToiletCommentModel> {
+  ): Promise<Comment> {
     const existingComment = await this.commentRepository.findOne({
-      where: { id: id, user: { email: email } },
+      where: { id: commentId, user: { id: userId } },
     });
 
     if (!existingComment) {
-      throw new NotFoundException(`{id}번의 댓글을 찾을 수 없습니다.`);
+      throw new NotFoundException(`{commentId}번의 댓글을 찾을 수 없습니다.`);
     }
 
     existingComment.comment = comment;
@@ -88,14 +88,14 @@ export class UserToiletCommentService {
   }
 
   async deleteComment(
-    email: string,
+    userId: number,
     commentId: number,
     toiletId: number,
   ): Promise<void> {
     const existingComment = await this.commentRepository.findOne({
       where: {
         id: commentId,
-        user: { email: email },
+        user: { id: userId },
         toilet: { id: toiletId },
       },
     });
@@ -104,6 +104,6 @@ export class UserToiletCommentService {
       throw new NotFoundException(`{commentId}번의 댓글을 찾을 수 없습니다.`);
     }
 
-    await this.commentRepository.delete(existingComment.id);
+    await this.commentRepository.delete(commentId);
   }
 }

@@ -10,30 +10,27 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { UserToiletCommentService } from './comment.service';
+import { CommentService } from './comment.service';
 import { Public } from 'src/decorator/public.decorator';
 import { Request } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
 @ApiTags('Comments')
 @Controller('comments')
-export class UserToiletCommentController {
-  constructor(
-    private readonly userToiletCommentService: UserToiletCommentService,
-  ) {}
+export class CommentController {
+  constructor(private readonly CommentService: CommentService) {}
 
   @Public()
   @Get(':toiletId/public')
   @HttpCode(200)
   @ApiOperation({ summary: '댓글 조회(비로그인 유저)' })
   async getCommentsPublic(@Param('toiletId', ParseIntPipe) toiletId: number) {
-    return this.userToiletCommentService.getCommentsPublic(toiletId);
+    return this.CommentService.getCommentsPublic(toiletId);
   }
 
   @Get(':toiletId')
@@ -44,9 +41,8 @@ export class UserToiletCommentController {
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const id = String(req.user.id);
-
-    return this.userToiletCommentService.getComments(toiletId, id);
+    const userId = req.user.id;
+    return this.CommentService.getComments(toiletId, userId);
   }
 
   @Post(':toiletId')
@@ -68,10 +64,10 @@ export class UserToiletCommentController {
     @Body() body: { comment: string },
     @Req() req: Request,
   ) {
-    const { email } = req.user;
+    const userId = Number(req.user.id);
     const { comment } = body;
 
-    await this.userToiletCommentService.addComment(toiletId, email, comment);
+    await this.CommentService.addComment(toiletId, userId, comment);
 
     return { statusCode: 201, message: 'comment created successfully' };
   }
@@ -95,10 +91,11 @@ export class UserToiletCommentController {
     @Body() body: { id: number; comment: string },
     @Req() req: Request,
   ) {
-    const { email } = req.user;
-    const { id, comment } = body;
+    const userId = Number(req.user.id);
 
-    await this.userToiletCommentService.updateComment(email, id, comment);
+    const { id: commentId, comment } = body;
+
+    await this.CommentService.updateComment(userId, commentId, comment);
 
     return { statusCode: 200, message: 'comment updated successfully' };
   }
@@ -120,16 +117,11 @@ export class UserToiletCommentController {
   async deleteComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Param('commentId', ParseIntPipe) commentId: number,
-    // @Body() body: { id: number },
     @Req() req: Request,
   ) {
-    const { email } = req.user;
+    const userId = Number(req.user.id);
 
-    await this.userToiletCommentService.deleteComment(
-      email,
-      commentId,
-      toiletId,
-    );
+    await this.CommentService.deleteComment(userId, commentId, toiletId);
 
     return { statusCode: 200, message: 'comment deleted successfully' };
   }
