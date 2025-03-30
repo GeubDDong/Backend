@@ -24,13 +24,21 @@ export class ToiletService {
   ): Promise<ToiletDto[]> {
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
-      .leftJoinAndSelect('toilet.favorites', 'favorites')
+      .addSelect(
+        `ST_DistanceSphere(
+        ST_MakePoint(toilet.longitude, toilet.latitude),
+        ST_MakePoint(:cenLng, :cenLat)
+      )`,
+        'distance',
+      )
       .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
       .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
+      .setParameters({ cenLat, cenLng })
+      .orderBy('distance', 'ASC')
       .getMany();
 
     return await Promise.all(
-      toilets.map(async (toilet) => {
+      toilets.map(async (toilet, index) => {
         let liked = { like: false };
 
         if (userEmail) {
@@ -47,7 +55,7 @@ export class ToiletService {
           longitude: toilet.longitude,
           open_hours: toilet.open_hour,
           liked,
-          nearest: false,
+          nearest: index === 0,
         };
       }),
     );

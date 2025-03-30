@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/create.user.dto';
-import { UsersModel } from 'src/entity/user.entity';
+import { User } from '../entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersModel)
-    private readonly usersRepository: Repository<UsersModel>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
   ) {}
 
   async findByEmail(email: string) {
