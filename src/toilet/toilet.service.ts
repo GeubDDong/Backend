@@ -24,11 +24,13 @@ export class ToiletService {
   ): Promise<ToiletDto[]> {
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
+      .leftJoinAndSelect('toilet.management', 'management')
+      .leftJoinAndSelect('toilet.facility', 'facility')
       .addSelect(
         `ST_DistanceSphere(
-        ST_MakePoint(toilet.longitude, toilet.latitude),
-        ST_MakePoint(:cenLng, :cenLat)
-      )`,
+          ST_MakePoint(toilet.longitude::float8, toilet.latitude::float8),
+          ST_MakePoint(CAST(:cenLng AS float8), CAST(:cenLat AS float8))
+        )`,
         'distance',
       )
       .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
