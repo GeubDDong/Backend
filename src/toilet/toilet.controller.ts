@@ -2,14 +2,7 @@ import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { Public } from 'src/decorator/public.decorator';
 import { ToiletService } from './toilet.service';
 import { Request } from 'express';
-import {
-  ApiHeader,
-  ApiOperation,
-  ApiProperty,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ToiletDto } from 'src/dto/toilet.dto';
 
 @ApiTags('Toilet')

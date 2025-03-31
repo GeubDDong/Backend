@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ToiletModel } from '../entity/toilet.entity';
+import { Toilet } from 'src/entity/toilet.entity';
 import { ToiletDto } from '../dto/toilet.dto';
 import { LikesService } from 'src/like/likes.service';
 
 @Injectable()
 export class ToiletService {
   constructor(
-    @InjectRepository(ToiletModel)
-    private readonly toiletRepository: Repository<ToiletModel>,
+    @InjectRepository(Toilet)
+    private readonly toiletRepository: Repository<Toilet>,
     private readonly likeService: LikesService,
   ) {}
 
@@ -24,20 +24,30 @@ export class ToiletService {
   ): Promise<ToiletDto[]> {
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
-      .leftJoinAndSelect('toilet.likes', 'likes')
-      .loadRelationCountAndMap('toilet.likeCount', 'toilet.likes')
+      .leftJoinAndSelect('toilet.management', 'management')
+      .leftJoinAndSelect('toilet.facility', 'facility')
+      .addSelect(
+        `ST_DistanceSphere(
+          ST_MakePoint(toilet.longitude::float8, toilet.latitude::float8),
+          ST_MakePoint(CAST(:cenLng AS float8), CAST(:cenLat AS float8))
+        )`,
+        'distance',
+      )
       .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
       .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
+      .setParameters({ cenLat, cenLng })
+      .orderBy('distance', 'ASC')
       .getMany();
 
     return await Promise.all(
-      toilets.map(async (toilet) => {
-        let likeData;
+      toilets.map(async (toilet, index) => {
+        let liked = { like: false };
+
         if (userEmail) {
-          likeData = await this.likeService.getLikes(toilet.id, userEmail);
-        } else {
-          likeData = await this.likeService.getLikesPublic(toilet.id);
+          const result = await this.likeService.getLikes(toilet.id, userEmail);
+          liked = { like: result.like };
         }
+
         return {
           id: toilet.id,
           name: toilet.name,
@@ -46,8 +56,8 @@ export class ToiletService {
           latitude: toilet.latitude,
           longitude: toilet.longitude,
           open_hours: toilet.open_hour,
-          liked: likeData,
-          nearest: false,
+          liked,
+          nearest: index === 0,
         };
       }),
     );

@@ -9,9 +9,9 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: '회원 ID',
-    example: '3966123937',
+    example: 234,
   })
-  id: string;
+  id: number;
 
   @ApiProperty({
     description: '사용자가 지정한 닉네임',
@@ -24,6 +24,4 @@ export class CreateUserDto {
     example: 'kakao',
   })
   provider?: string;
-
-  profile_image?: string;
 }

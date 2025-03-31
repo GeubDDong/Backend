@@ -5,23 +5,23 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from 'src/dto/create.user.dto';
-import { UsersModel } from 'src/entity/user.entity';
+import { User } from '../entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(UsersModel)
-    private readonly usersRepository: Repository<UsersModel>,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
   ) {}
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User | null> {
     return await this.usersRepository.findOne({ where: { email } });
   }
 
-  async findOne(id: string) {
+  async findOne(userId: number) {
     return this.usersRepository.findOne({
-      where: { id },
+      where: { id: userId },
       select: ['email', 'id', 'refresh_token'],
     });
   }
@@ -31,8 +31,8 @@ export class UsersService {
   }
 
   async updateHashedRefreshToken(
-    userId: string,
-    hashedRefreshToken: string | null,
+    userId: number,
+    hashedRefreshToken: string | undefined,
   ) {
     const result = await this.usersRepository.update(
       { id: userId },
@@ -46,7 +46,7 @@ export class UsersService {
     return { statusCode: 201, message: 'logout successfully' };
   }
 
-  async updateNickname(userId: string, nickname: string) {
+  async updateNickname(userId: number, nickname: string) {
     const user = await this.usersRepository.findOne({
       where: { nickname },
     });

@@ -18,7 +18,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { stat } from 'fs';
 
 @ApiTags('Likes')
 @Controller('likes')

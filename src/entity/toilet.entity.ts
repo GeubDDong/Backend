@@ -1,13 +1,25 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { UserToiletCommentModel } from './user.toilet.comment.entity';
-import { LikesModel } from './likes.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToOne,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
+import { Management } from './management.entity';
+import { ToiletFacility } from './toilet_facility.entity';
+import { Comment } from './comment.entity';
+import { Favorite } from './favorite.entity';
 
-@Entity()
-export class ToiletModel {
-  @PrimaryGeneratedColumn()
+@Entity('toilets')
+export class Toilet {
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column()
   name: string;
 
   @Column({ type: 'varchar', length: 150, nullable: true })
@@ -16,48 +28,45 @@ export class ToiletModel {
   @Column({ type: 'varchar', length: 150, nullable: true })
   lot_address: string;
 
-  @Column({ type: 'int', nullable: false, default: 0 })
-  disabled_male: number;
+  @Column({ type: 'float', nullable: true })
+  latitude: number;
 
-  @Column({ type: 'int', nullable: false, default: 0 })
-  kids_toilet_male: number;
+  @Column({ type: 'float', nullable: true })
+  longitude: number;
 
-  @Column({ type: 'int', nullable: false, default: 0 })
-  disabled_female: number;
-
-  @Column({ type: 'int', nullable: false, default: 0 })
-  kids_toilet_female: number;
-
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  management_agency: string;
-
-  @Column({ type: 'varchar', length: 20, nullable: true, default: '정보 없음' })
-  phone_number: string;
-
-  @Column({ type: 'varchar', length: 50, nullable: true, default: '정보없음' })
+  @Column({ nullable: true })
   open_hour: string;
 
-  @Column({ type: 'float8', nullable: true, default: 0.0 })
-  latitude?: number;
+  @Column({ type: 'float', default: 0 })
+  avg_cleanliness: number;
 
-  @Column({ type: 'float8', nullable: true, default: 0.0 })
-  longitude?: number;
+  @Column({ type: 'float', default: 0 })
+  avg_amenities: number;
 
-  @Column({ type: 'varchar', length: 1, nullable: false, default: 'N' })
-  emergency_bell: string;
+  @Column({ type: 'float', default: 0 })
+  avg_accessibility: number;
 
-  @Column({ type: 'varchar', length: 1, nullable: false, default: 'N' })
-  cctv: string;
+  @Column({ default: 0 })
+  comment_count: number;
 
-  @Column({ type: 'varchar', length: 1, nullable: false, default: 'N' })
-  diaper_changing_station: string;
+  @ManyToOne(() => Management, (management) => management.toilets)
+  @JoinColumn({ name: 'management_id' })
+  management: Management;
 
-  @Column({ type: 'date', nullable: true })
-  data_reference_date: Date;
+  @OneToOne(() => ToiletFacility, (facility) => facility.toilet, {
+    cascade: true,
+  })
+  facility: ToiletFacility;
 
-  @OneToMany(() => UserToiletCommentModel, (comment) => comment.toilet)
-  comments: UserToiletCommentModel[];
+  @OneToMany(() => Comment, (comment) => comment.toilet)
+  comments: Comment[];
 
-  @OneToMany(() => LikesModel, (like) => like.toilet)
-  likes: LikesModel[];
+  @OneToMany(() => Favorite, (favorite) => favorite.toilet)
+  favorites: Favorite[];
+
+  @CreateDateColumn()
+  created_at: Date;
+
+  @UpdateDateColumn()
+  updated_at: Date;
 }

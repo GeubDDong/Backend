@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { UserToiletCommentService } from './user.toilet.comment.service';
-import { UserToiletCommentController } from './user.toilet.comment.controller';
+import { CommentService } from './comment.service';
+import { CommentController } from './comment.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserToiletCommentModel } from 'src/entity/user.toilet.comment.entity';
+import { Comment } from 'src/entity/comment.entity';
 import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
@@ -12,19 +12,19 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserToiletCommentModel]),
+    TypeOrmModule.forFeature([Comment]),
     ConfigModule.forFeature(jwtConfig),
     AuthModule,
   ],
-  controllers: [UserToiletCommentController],
+  controllers: [CommentController],
   providers: [
-    UserToiletCommentService,
+    CommentService,
     JwtStrategy,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
   ],
-  exports: [UserToiletCommentService],
+  exports: [CommentService],
 })
-export class UserToiletCommentModule {}
+export class CommentModule {}
