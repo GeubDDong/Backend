@@ -1,0 +1,22 @@
+config:
+  target: 'http://localhost:8080'
+  phases:
+    - duration: 30
+      arrivalRate: 100
+  defaults:
+    headers:
+      Authorization: 'Bearer {{ token }}'
+
+variables:
+  token: 'YOUR_ACCESS_TOKEN'
+  toiletId: 1
+
+scenarios:
+  - name: 즐겨찾기 조회 / 추가 / 삭제
+    flow:
+      - get:
+          url: '/likes/{{ toiletId }}'
+      - post:
+          url: '/likes/{{ toiletId }}'
+      - delete:
+          url: '/likes/{{ toiletId }}'
