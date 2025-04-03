@@ -28,12 +28,12 @@ export class LikesController {
   @Get(':toiletId/public')
   @HttpCode(200)
   @ApiOperation({
-    summary: '좋아요 조회 (비로그인 유저)',
+    summary: '즐겨찾기 조회 (비로그인 유저)',
   })
   @ApiParam({ name: 'toiletId', description: '화장실 ID' })
   @ApiResponse({
     status: 200,
-    description: '좋아요 개수 반환',
+    description: '즐겨찾기 개수 반환',
     schema: {
       example: {
         like: false,
@@ -49,12 +49,12 @@ export class LikesController {
   @HttpCode(200)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '좋아요 조회 (로그인 유저)',
+    summary: '즐겨찾기 조회 (로그인 유저)',
   })
   @ApiParam({ name: 'toiletId', description: '화장실 ID' })
   @ApiResponse({
     status: 200,
-    description: '좋아요 여부 및 개수 반환',
+    description: '즐겨찾기 여부 및 개수 반환',
     schema: {
       example: {
         like: true,
@@ -75,12 +75,12 @@ export class LikesController {
   @HttpCode(201)
   @ApiBearerAuth()
   @ApiOperation({
-    summary: '좋아요 추가',
+    summary: '즐겨찾기 추가',
   })
   @ApiParam({ name: 'toiletId', description: '화장실 ID' })
   @ApiResponse({
     status: 201,
-    description: '좋아요 추가 성공',
+    description: '즐겨찾기 추가 성공',
     schema: {
       example: {
         statusCode: 201,
@@ -91,11 +91,11 @@ export class LikesController {
   })
   @ApiResponse({
     status: 409,
-    description: '이미 좋아요한 화장실',
+    description: '이미 즐겨찾기한 화장실',
     schema: {
       example: {
         statusCode: 409,
-        message: '이미 좋아요를 추가한 화장실입니다.',
+        message: '이미 즐겨찾기를 추가한 화장실입니다.',
       },
     },
   })
@@ -117,11 +117,11 @@ export class LikesController {
   @Delete(':toiletId')
   @HttpCode(200)
   @ApiBearerAuth()
-  @ApiOperation({ summary: '좋아요 삭제' })
+  @ApiOperation({ summary: '즐겨찾기 삭제' })
   @ApiParam({ name: 'toiletId', description: '화장실 ID' })
   @ApiResponse({
     status: 201,
-    description: '좋아요 삭제 성공',
+    description: '즐겨찾기 삭제 성공',
     schema: {
       example: {
         statusCode: 201,
@@ -132,11 +132,11 @@ export class LikesController {
   })
   @ApiResponse({
     status: 409,
-    description: '좋아요 삭제 실패',
+    description: '즐겨찾기 삭제 실패',
     schema: {
       example: {
         statusCode: 409,
-        message: '좋아요를 삭제 할 화장실이 존재하지 않습니다.',
+        message: '즐겨찾기를 해제 할 화장실이 존재하지 않습니다.',
       },
     },
   })
