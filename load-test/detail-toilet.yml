@@ -1,0 +1,15 @@
+config:
+  target: 'http://localhost:8080'
+  phases:
+    - duration: 30
+      arrivalRate: 100
+  defaults:
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: 화장실 상세 정보 조회
+    flow:
+      - get:
+          name: 화장실 상세 정보 요청
+          url: /detail/1
