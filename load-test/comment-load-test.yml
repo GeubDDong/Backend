@@ -1,0 +1,14 @@
+config:
+  target: 'http://localhost:8080'
+  phases:
+    - duration: 30
+      arrivalRate: 100
+
+scenarios:
+  - name: 댓글 목록 조회 (비회원)
+    flow:
+      - get:
+          url: '/comments/1/public' # 화장실 ID = 1번
+
+
+
