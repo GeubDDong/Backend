@@ -18,6 +18,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { RedisService } from 'src/cache/redis.service';
 
 @ApiTags('Likes')
 @Controller('likes')
