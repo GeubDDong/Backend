@@ -8,7 +8,7 @@ WORKDIR /Backend
 COPY package.json package-lock.json ./
 
 # 의존성 설치 (더 안정적인 방식)
-RUN npm ci --omit=dev
+RUN npm ci
 
 # 소스 코드 복사
 COPY . .
