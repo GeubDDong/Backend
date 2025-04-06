@@ -13,6 +13,7 @@ export class DetailToiletService {
   ) {}
 
   async getDetailInfo(id: number): Promise<DetailToiletResponseDto> {
+    // const cacheKey=`toilet:detail:${toilet}`
     const toiletInfo = await this.toiletRepository.findOne({
       where: { id: id },
       relations: ['facility', 'management'],
