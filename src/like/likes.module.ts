@@ -4,7 +4,7 @@ import { LikesService } from './likes.service';
 import { LikesController } from './likes.controller';
 import { Favorite } from 'src/entity/favorite.entity';
 import { Toilet } from 'src/entity/toilet.entity';
-import { UsersModule } from 'src/user/user.module'; // ✅ 이거 추가
+import { UsersModule } from 'src/user/user.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Favorite, Toilet]), UsersModule],

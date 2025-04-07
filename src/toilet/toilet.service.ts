@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Toilet } from 'src/entity/toilet.entity';
 import { ToiletDto } from '../dto/toilet.dto';
 import { LikesService } from 'src/like/likes.service';
+import { RedisService } from 'src/cache/redis.service';
 
 @Injectable()
 export class ToiletService {
@@ -11,6 +12,7 @@ export class ToiletService {
     @InjectRepository(Toilet)
     private readonly toiletRepository: Repository<Toilet>,
     private readonly likeService: LikesService,
+    private readonly redisService: RedisService,
   ) {}
 
   async getToilets(
@@ -22,6 +24,14 @@ export class ToiletService {
     right: number,
     userEmail?: string,
   ): Promise<ToiletDto[]> {
+    const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userEmail || 'public'}`;
+    const cached = await this.redisService.get<ToiletDto[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    console.log('db에서 가져옴');
     const toilets = await this.toiletRepository
       .createQueryBuilder('toilet')
       .leftJoinAndSelect('toilet.management', 'management')
@@ -39,7 +49,7 @@ export class ToiletService {
       .orderBy('distance', 'ASC')
       .getMany();
 
-    return await Promise.all(
+    const result = await Promise.all(
       toilets.map(async (toilet, index) => {
         let liked = { like: false };
 
@@ -61,5 +71,7 @@ export class ToiletService {
         };
       }),
     );
+    await this.redisService.set(cacheKey, result, 300);
+    return result;
   }
 }

@@ -1,5 +1,7 @@
 import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
+import { rejects } from 'assert';
 import Redis from 'ioredis';
+import { resolve } from 'path';
 
 @Injectable()
 export class RedisService implements OnModuleDestroy {
@@ -25,6 +27,25 @@ export class RedisService implements OnModuleDestroy {
 
   async flushAll(): Promise<void> {
     await this.redisClient.flushall();
+  }
+
+  async scanKeys(pattern: string): Promise<string[]> {
+    const stream = this.redisClient.scanStream({ match: pattern });
+    const keys: string[] = [];
+
+    return new Promise((resolve, reject) => {
+      stream.on('data', (resultKeys: string[]) => {
+        for (const key of resultKeys) {
+          keys.push(key);
+        }
+      });
+      stream.on('end', () => {
+        resolve(keys);
+      });
+      stream.on('err', (err) => {
+        reject(err);
+      });
+    });
   }
 
   onModuleDestroy() {
