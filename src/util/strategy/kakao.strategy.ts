@@ -28,20 +28,19 @@ export class KakaoStrategy extends PassportStrategy(Strategy) {
     refreshToken: string,
     profile: Profile,
   ) {
-    const { _json, id, username, provider } = profile;
+    const { _json, id, provider } = profile;
 
     const payload = {
-      id,
-      username,
+      socialId: id,
       provider,
       email: _json?.kakao_account.email,
       profile_image: _json?.kakao_account.profile.thumbnail_image_url,
     };
 
-    const { user, isNewUser } =
-      await this.authService.validateUserByEmail(payload);
+    const { user, isNewUser, socialId } =
+      await this.authService.validateUserSocialId(payload);
 
-    const userWithStatus = { ...user, isNewUser };
+    const userWithStatus = { ...user, isNewUser, socialId };
 
     return userWithStatus;
   }
