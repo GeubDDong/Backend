@@ -16,11 +16,11 @@ export class AuthService {
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  async getStoreTokens(userId: number) {
-    const { accessToken, refreshToken } = await this.generateTokens(userId);
+  async getStoreTokens(socialId: string) {
+    const { accessToken, refreshToken } = await this.generateTokens(socialId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
-    await this.usersService.updateHashedRefreshToken(
-      userId,
+    await this.usersService.storeHashedRefreshToken(
+      socialId,
       hashedRefreshToken,
     );
     return {
@@ -29,8 +29,9 @@ export class AuthService {
     };
   }
 
-  async generateTokens(userId: number) {
-    const payload: AuthJwtPayload = { sub: String(userId) };
+  async generateTokens(socialId: string) {
+    const payload: AuthJwtPayload = { socialId: socialId };
+
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload),
       this.jwtService.signAsync(payload, this.refreshTokenConfig),
@@ -41,27 +42,40 @@ export class AuthService {
     };
   }
 
-  async validateUserByEmail(user: CreateUserDto) {
-    const existUser = await this.usersService.findByEmail(user.email);
-    if (existUser) return { user: existUser, isNewUser: false };
+  async validateUserSocialId(user: CreateUserDto) {
+    const existUser = await this.usersService.findBySocialId(user.socialId);
 
-    const newUser = await this.usersService.create(user);
-    return { user: newUser, isNewUser: true };
+    if (existUser) {
+      return {
+        user: { ...existUser },
+        socialId: existUser.social_id,
+        isNewUser: false,
+      };
+    }
+
+    const newUser = await this.usersService.createUser(user);
+    return {
+      user: { ...newUser },
+      socialId: newUser.social_id,
+      isNewUser: true,
+    };
   }
 
-  async validateUserById(userId: number) {
-    const user = await this.usersService.findOne(userId);
+  async validateUserBySocialId(socialId: string) {
+    const user = await this.usersService.getAuthPayloadBySocialId(socialId);
     if (!user) throw new UnauthorizedException('User not found!');
-    return user;
+
+    return {
+      socialId: user.social_id,
+    };
   }
 
-  async generateAccessToken(userId: number) {
-    const payload: AuthJwtPayload = { sub: String(userId) };
+  async generateAccessToken(socialId: string) {
+    const payload: AuthJwtPayload = { socialId: socialId };
     return this.jwtService.signAsync(payload);
   }
-
-  async validateRefreshToken(userId: number, refreshToken: string) {
-    const user = await this.usersService.findOne(userId);
+  async validateRefreshToken(socialId: string, refreshToken: string) {
+    const user = await this.usersService.getAuthPayloadBySocialId(socialId);
     if (!user || !user.refresh_token)
       throw new UnauthorizedException(
         '유저 또는 유저의 리프레시 토큰을 찾을 수 없습니다.',
@@ -75,19 +89,19 @@ export class AuthService {
     if (!refreshTokenMatches)
       throw new UnauthorizedException('서로 다른 리프레시 토큰입니다.');
 
-    return { id: user.id, refresh_token: user.refresh_token };
+    return { socialId: user.social_id, refresh_token: user.refresh_token };
   }
 
-  async logout(userId: number) {
+  async logout(socialId: string) {
     const { statusCode, message } =
-      await this.usersService.updateHashedRefreshToken(userId, undefined);
+      await this.usersService.storeHashedRefreshToken(socialId, null);
 
     return { statusCode, message };
   }
 
-  async setNickname(userId: number, nickname: string) {
-    const { statusCode, message } = await this.usersService.updateNickname(
-      userId,
+  async setNickname(socialId: string, nickname: string) {
+    const { statusCode, message } = await this.usersService.setNickname(
+      socialId,
       nickname,
     );
     return { statusCode, message };

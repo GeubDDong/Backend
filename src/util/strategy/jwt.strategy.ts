@@ -21,11 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: AuthJwtPayload) {
-    if (!payload || !payload.sub) {
+    if (!payload || !payload.socialId) {
       throw new UnauthorizedException('Invalid access token');
     }
 
-    const user = await this.authService.validateUserById(Number(payload.sub));
+    const user = await this.authService.validateUserBySocialId(
+      payload.socialId,
+    );
 
     return user;
   }
