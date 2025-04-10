@@ -23,6 +23,9 @@ export class Comment {
   @JoinColumn({ name: 'toilet_id' })
   toilet: Toilet;
 
+  @Column({ type: 'float', default: 0 })
+  avg_rating: number;
+
   @Column({ type: 'int' })
   rating_cleanliness: number;
 
@@ -34,6 +37,9 @@ export class Comment {
 
   @Column({ type: 'text', nullable: true })
   comment: string;
+
+  @Column({ type: 'boolean', default: false })
+  is_deleted: boolean;
 
   @CreateDateColumn({ type: 'date' })
   created_at: Date;

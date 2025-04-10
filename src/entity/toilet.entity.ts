@@ -38,6 +38,9 @@ export class Toilet {
   open_hour: string;
 
   @Column({ type: 'float', default: 0 })
+  avg_rating: number;
+
+  @Column({ type: 'float', default: 0 })
   avg_cleanliness: number;
 
   @Column({ type: 'float', default: 0 })
