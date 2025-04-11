@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/dto/create.user.dto';
+import { CreateUserDto } from 'src/dto/auth/create.user.dto';
 import { User } from '../entity/user.entity';
 import { UsersRepository } from './user.repository';
 

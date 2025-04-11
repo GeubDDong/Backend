@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Toilet } from '../entity/toilet.entity';
 import { Favorite } from 'src/entity/favorite.entity';
@@ -63,5 +63,11 @@ export class ToiletRepository {
       .getRawOne();
 
     return Number(result?.count ?? 0);
+  }
+
+  async findOneByToiletId(id: number): Promise<Toilet | null> {
+    const result = await this.toiletRepository.findOne({ where: { id } });
+
+    return result;
   }
 }

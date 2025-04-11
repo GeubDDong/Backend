@@ -1,29 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { DetailToiletResponseDto } from 'src/dto/detail.toilet.response.dto';
+import { DetailToiletResponseDto } from 'src/dto/detailToilet/detail.toilet.response.dto';
 import { Toilet } from 'src/entity/toilet.entity';
-import { Repository } from 'typeorm';
+import { DetailToiletRepository } from './detail.toilet.repository';
 
 @Injectable()
 export class DetailToiletService {
   constructor(
-    @InjectRepository(Toilet)
-    private readonly toiletRepository: Repository<Toilet>,
+    private readonly detailToiletRepository: DetailToiletRepository,
   ) {}
 
   async getDetailInfo(id: number): Promise<DetailToiletResponseDto> {
-    const toiletInfo = await this.toiletRepository.findOne({
-      where: { id: id },
-      relations: ['facility', 'management'],
+    const toiletInfo: Toilet =
+      await this.detailToiletRepository.findDetailInfoById(id);
+
+    return plainToInstance(DetailToiletResponseDto, toiletInfo, {
+      excludeExtraneousValues: true,
     });
-
-    if (!toiletInfo) {
-      throw new NotFoundException(
-        `${id}에 해당하는 화장실 정보를 찾을 수 없습니다.`,
-      );
-    }
-
-    return plainToInstance(DetailToiletResponseDto, toiletInfo);
   }
 }
