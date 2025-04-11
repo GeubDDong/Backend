@@ -49,9 +49,6 @@ export class Toilet {
   @Column({ type: 'float', default: 0 })
   avg_accessibility: number;
 
-  @Column({ default: 0 })
-  comment_count: number;
-
   @ManyToOne(() => Management, (management) => management.toilets)
   @JoinColumn({ name: 'management_id' })
   management: Management;
