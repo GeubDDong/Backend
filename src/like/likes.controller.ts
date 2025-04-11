@@ -9,7 +9,6 @@ import {
   Req,
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
-import { Public } from 'src/decorator/public.decorator';
 import { Request } from 'express';
 import {
   ApiBearerAuth,
@@ -24,27 +23,6 @@ import { RedisService } from 'src/cache/redis.service';
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
-
-  @Public()
-  @Get(':toiletId/public')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: '즐겨찾기 조회 (비로그인 유저)',
-  })
-  @ApiParam({ name: 'toiletId', description: '화장실 ID' })
-  @ApiResponse({
-    status: 200,
-    description: '즐겨찾기 개수 반환',
-    schema: {
-      example: {
-        like: false,
-        count: 4,
-      },
-    },
-  })
-  async getLikesPublic(@Param('toiletId', ParseIntPipe) toiletId: number) {
-    return await this.likesService.getLikesPublic(toiletId);
-  }
 
   @Get(':toiletId')
   @HttpCode(200)
@@ -63,13 +41,13 @@ export class LikesController {
       },
     },
   })
-  async getLikes(
+  async getLike(
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const { email } = req.user;
+    const { socialId } = req.user;
 
-    return await this.likesService.getLikes(toiletId, email);
+    return await this.likesService.getLiked(toiletId, socialId);
   }
 
   @Post(':toiletId')
@@ -104,9 +82,9 @@ export class LikesController {
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const { email } = req.user;
+    const { socialId } = req.user;
 
-    const result = await this.likesService.addLike(email, toiletId);
+    const result = await this.likesService.addLike(socialId, toiletId);
 
     return {
       statusCode: 201,
@@ -145,9 +123,9 @@ export class LikesController {
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const { email } = req.user;
+    const { socialId } = req.user;
 
-    const result = await this.likesService.deleteLike(email, toiletId);
+    const result = await this.likesService.deleteLike(socialId, toiletId);
 
     return {
       statusCode: 201,
