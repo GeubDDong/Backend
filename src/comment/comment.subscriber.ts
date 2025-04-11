@@ -4,7 +4,6 @@ import {
   EntitySubscriberInterface,
   EventSubscriber,
   InsertEvent,
-  RemoveEvent,
   UpdateEvent,
 } from 'typeorm';
 import { Comment } from 'src/entity/comment.entity';

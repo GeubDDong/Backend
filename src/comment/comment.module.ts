@@ -9,10 +9,14 @@ import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
 import { ConfigModule } from '@nestjs/config';
 import jwtConfig from 'src/configs/auth/jwt.config';
 import { AuthModule } from '../auth/auth.module';
+import { CommentsRepository } from './comment.repository';
+import { User } from 'src/entity/user.entity';
+import { UsersRepository } from 'src/user/user.repository';
+import { CommentSubscriber } from './comment.subscriber';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment]),
+    TypeOrmModule.forFeature([Comment, User]),
     ConfigModule.forFeature(jwtConfig),
     AuthModule,
   ],
@@ -24,7 +28,10 @@ import { AuthModule } from '../auth/auth.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    CommentsRepository,
+    UsersRepository,
+    CommentSubscriber,
   ],
-  exports: [CommentService],
+  exports: [CommentsRepository],
 })
 export class CommentModule {}
