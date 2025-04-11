@@ -11,13 +11,14 @@ export class CreateUserDto {
     description: '회원 ID',
     example: 234,
   })
-  id: number;
+  socialId: string;
 
   @ApiProperty({
-    description: '사용자가 지정한 닉네임',
-    example: '홍길동',
+    description: '프로필 이미지',
+    example:
+      'http://k.kakaocdn.net/dn/isqYD/btsMIDcNbdn/MxiPPNlqtw8XUYYe21wec0/img_110x110.jpg',
   })
-  username: string;
+  profile_image: string;
 
   @ApiPropertyOptional({
     description: '사용자가 로그인한 경로',

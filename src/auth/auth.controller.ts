@@ -52,24 +52,30 @@ export class AuthController {
     req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const user = req.user;
-    const userId = Number(user.id);
+    const socialId = req.user.socialId;
 
     const { accessToken, refreshToken } =
-      await this.authService.getStoreTokens(userId);
+      await this.authService.getStoreTokens(socialId);
 
     const cookieOptions: CookieOptions = { httpOnly: true, secure: true };
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    if (user.isNewUser) {
-      return res.redirect(
-        `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}&flag=newUser`,
-      );
-    }
+    // if (user.isNewUser) {
+    //   return res.redirect(
+    //     `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}&flag=newUser`,
+    //   );
+    // }
 
-    return res.redirect(
-      `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}`,
-    );
+    // return res.redirect(
+    //   `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}`,
+    // );
+
+    return {
+      statusCode: 200,
+      message: 'login successful',
+      accessToken,
+      refreshToken,
+    };
   }
 
   @Public()
@@ -79,9 +85,9 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const userId = Number(req.user.id);
+    const socialId = req.user.socialId;
 
-    const accessToken = await this.authService.generateAccessToken(userId);
+    const accessToken = await this.authService.generateAccessToken(socialId);
 
     return {
       statusCode: 201,
@@ -92,9 +98,9 @@ export class AuthController {
 
   @Post('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const userId = Number(req.user.id);
+    const socialId = req.user.socialId;
 
-    const { statusCode, message } = await this.authService.logout(userId);
+    const { statusCode, message } = await this.authService.logout(socialId);
 
     res.clearCookie('refreshToken');
 
@@ -107,11 +113,11 @@ export class AuthController {
     @Req() req: Request,
     @Body() setNicknameDto: SetNicknameDto,
   ) {
-    const userId = Number(req.user.id);
+    const socialId = req.user.socialId;
     const { nickname } = setNicknameDto;
 
     const { statusCode, message } = await this.authService.setNickname(
-      userId,
+      socialId,
       nickname,
     );
     return { statusCode, message };
