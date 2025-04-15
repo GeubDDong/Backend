@@ -4,6 +4,7 @@ import {
   Entity,
   OneToMany,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Comment } from './comment.entity';
@@ -11,7 +12,7 @@ import { Favorite } from './favorite.entity';
 
 @Entity('users')
 export class User {
-  @PrimaryColumn({ type: 'int' })
+  @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
   @Column({ unique: true })
@@ -23,11 +24,14 @@ export class User {
   @Column({ type: 'varchar', length: 30, nullable: true })
   nickname: string;
 
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  profile_image: string;
+
   @Column({ type: 'varchar', length: 10 })
   provider: string;
 
   @Column({ type: 'varchar', length: 200, nullable: true })
-  refresh_token: string;
+  refresh_token: string | null;
 
   @CreateDateColumn({ type: 'date' })
   created_at: Date;
