@@ -21,28 +21,28 @@ export class ToiletFacility {
   toilet: Toilet;
 
   @Column({ type: 'int', default: 0 })
-  male_toilet_count: number;
+  male_toilet: number;
 
   @Column({ type: 'int', default: 0 })
-  male_urinal_count: number;
+  male_urinal: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_male_toilet_count: number;
+  disabled_male_toilet: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_male_urinal_count: number;
+  disabled_male_urinal: number;
 
   @Column({ type: 'int', default: 0 })
-  kids_male_toilet_count: number;
+  kids_toilet_male: number;
 
   @Column({ type: 'int', default: 0 })
-  female_toilet_count: number;
+  female_toilet: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_female_toilet_count: number;
+  disabled_female_toilet: number;
 
   @Column({ type: 'int', default: 0 })
-  kids_female_toilet_count: number;
+  kids_toilet_female: number;
 
   @Column({ type: 'varchar', length: 1, default: 'N' })
   emergency_bell: string;
