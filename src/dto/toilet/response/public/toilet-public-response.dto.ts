@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ToiletBaseDto {
+export class PublicToiletDto {
   @ApiProperty({ description: '화장실 ID', example: 1 })
   id: number;
 
