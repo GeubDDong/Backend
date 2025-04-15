@@ -6,14 +6,14 @@ import { User } from 'src/entity/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class LikesRepository {
+export class FavoriteRepository {
   constructor(
     @InjectRepository(Favorite)
-    private readonly likesRepository: Repository<Favorite>,
+    private readonly favoritesRepository: Repository<Favorite>,
   ) {}
 
   async findLikedBySocialId(socialId: string, toiletId: number) {
-    const result = await this.likesRepository.findOne({
+    const result = await this.favoritesRepository.findOne({
       where: { user: { social_id: socialId }, toilet: { id: toiletId } },
     });
 
@@ -21,7 +21,7 @@ export class LikesRepository {
   }
 
   async checkAlreadyLiked(userId: number, toiletId: number) {
-    const result = await this.likesRepository.findOne({
+    const result = await this.favoritesRepository.findOne({
       where: { user: { id: userId }, toilet: { id: toiletId } },
     });
 
@@ -29,7 +29,7 @@ export class LikesRepository {
   }
 
   async createLike(user: User, toilet: Toilet): Promise<void> {
-    const favoriteRepo = this.likesRepository;
+    const favoriteRepo = this.favoritesRepository;
 
     const newLike = favoriteRepo.create({ user, toilet });
 
@@ -37,7 +37,7 @@ export class LikesRepository {
   }
 
   async deleteLike(user: User, toilet: Toilet): Promise<void> {
-    const favoriteRepo = this.likesRepository;
+    const favoriteRepo = this.favoritesRepository;
 
     await favoriteRepo.delete({ user, toilet });
   }

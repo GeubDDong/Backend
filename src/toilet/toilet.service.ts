@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Toilet } from 'src/entity/toilet.entity';
 import { ToiletDto } from '../dto/toilet.dto';
-import { LikesService } from 'src/like/likes.service';
+import { FavoritesService } from 'src/favorite/favorites.service';
 import { RedisService } from 'src/cache/redis.service';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ToiletService {
   constructor(
     @InjectRepository(Toilet)
     private readonly toiletRepository: Repository<Toilet>,
-    private readonly likeService: LikesService,
+    private readonly favoritesService: FavoritesService,
     private readonly redisService: RedisService,
   ) {}
 
@@ -54,7 +54,10 @@ export class ToiletService {
         let liked = { like: false };
 
         if (userEmail) {
-          const result = await this.likeService.getLiked(toilet.id, userEmail);
+          const result = await this.favoritesService.getLiked(
+            toilet.id,
+            userEmail,
+          );
           liked = { like: result.like };
         }
 

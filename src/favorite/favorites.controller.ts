@@ -8,7 +8,7 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import { LikesService } from './likes.service';
+import { FavoritesService } from './favorites.service';
 import { Request } from 'express';
 import {
   ApiBearerAuth,
@@ -17,12 +17,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { RedisService } from 'src/cache/redis.service';
 
-@ApiTags('Likes')
-@Controller('likes')
-export class LikesController {
-  constructor(private readonly likesService: LikesService) {}
+@ApiTags('Favorites')
+@Controller('favorites')
+export class FavoritesController {
+  constructor(private readonly favoritesService: FavoritesService) {}
 
   @Get(':toiletId')
   @HttpCode(200)
@@ -47,7 +46,7 @@ export class LikesController {
   ) {
     const { socialId } = req.user;
 
-    return await this.likesService.getLiked(toiletId, socialId);
+    return await this.favoritesService.getLiked(toiletId, socialId);
   }
 
   @Post(':toiletId')
@@ -84,7 +83,7 @@ export class LikesController {
   ) {
     const { socialId } = req.user;
 
-    const result = await this.likesService.addLike(socialId, toiletId);
+    const result = await this.favoritesService.addLike(socialId, toiletId);
 
     return {
       statusCode: 201,
@@ -125,7 +124,7 @@ export class LikesController {
   ) {
     const { socialId } = req.user;
 
-    const result = await this.likesService.deleteLike(socialId, toiletId);
+    const result = await this.favoritesService.deleteLike(socialId, toiletId);
 
     return {
       statusCode: 201,

@@ -4,14 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RedisService } from 'src/cache/redis.service';
-import { LikesRepository } from './likes.repository';
+import { FavoriteRepository } from './favorites.repository';
 import { UsersRepository } from 'src/user/user.repository';
 import { ToiletRepository } from 'src/toilet/toilet.repository';
 
 @Injectable()
-export class LikesService {
+export class FavoritesService {
   constructor(
-    private readonly likesRepository: LikesRepository,
+    private readonly favoritesRepository: FavoriteRepository,
     private readonly usersRepository: UsersRepository,
     private readonly toiletsRepository: ToiletRepository,
     private readonly redisService: RedisService,
@@ -30,7 +30,7 @@ export class LikesService {
 
     if (!user) throw new NotFoundException('유저를 찾을 수 없습니다.');
 
-    const hasLiked = await this.likesRepository.findLikedBySocialId(
+    const hasLiked = await this.favoritesRepository.findLikedBySocialId(
       socialId,
       toiletId,
     );
@@ -60,7 +60,7 @@ export class LikesService {
     }
 
     const userId = user.id;
-    const existingLike = await this.likesRepository.checkAlreadyLiked(
+    const existingLike = await this.favoritesRepository.checkAlreadyLiked(
       userId,
       toiletId,
     );
@@ -71,7 +71,7 @@ export class LikesService {
 
     await this.invalidateCache(socialId, toiletId);
 
-    return await this.likesRepository.createLike(user, toilet);
+    return await this.favoritesRepository.createLike(user, toilet);
   }
 
   async deleteLike(socialId: string, toiletId: number) {
@@ -91,7 +91,7 @@ export class LikesService {
     }
 
     const userId = user.id;
-    const existingLike = await this.likesRepository.checkAlreadyLiked(
+    const existingLike = await this.favoritesRepository.checkAlreadyLiked(
       userId,
       toiletId,
     );
@@ -104,7 +104,7 @@ export class LikesService {
 
     await this.invalidateCache(socialId, toiletId);
 
-    return await this.likesRepository.deleteLike(user, toilet);
+    return await this.favoritesRepository.deleteLike(user, toilet);
   }
 
   private async invalidateCache(socialId: string, toiletId: number) {
