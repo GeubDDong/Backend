@@ -15,7 +15,7 @@ export class CommentsRepository {
 
   async findCommentsPublic(toiletId: number): Promise<any> {
     const comments = await this.commentRepository.find({
-      where: { toilet: { id: toiletId }, is_deleted: false },
+      where: { toilet: { id: toiletId }, deleted: false },
       relations: ['user'],
     });
 
@@ -27,7 +27,7 @@ export class CommentsRepository {
       where: {
         toilet: { id: toiletId },
         user: { social_id: socialId },
-        is_deleted: false,
+        deleted: false,
       },
       relations: ['user'],
     });
@@ -87,7 +87,7 @@ export class CommentsRepository {
       throw new Error('Comment not found');
     }
 
-    comment.is_deleted = true;
+    comment.deleted = true;
     const savedComment = await this.commentRepository.save(comment);
 
     await this.commentSubscriber.updateToiletAverages(
