@@ -24,13 +24,13 @@ export class RefreshJwtStrategy extends PassportStrategy(
         },
       ]),
       secretOrKey: refreshJwtConfiguration.secret,
-      ignoreExpiration: false, 
+      ignoreExpiration: false,
       passReqToCallback: true,
     });
   }
 
   async validate(req: Request, payload: AuthJwtPayload) {
-    const userId = Number(payload.sub);
+    const userId = payload.socialId;
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
