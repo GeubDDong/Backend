@@ -6,37 +6,43 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Unique,
 } from 'typeorm';
 import { Toilet } from './toilet.entity';
 
 @Entity('toilet_facilities')
+@Unique(['toilet'])
 export class ToiletFacility {
   @PrimaryGeneratedColumn({ type: 'int' })
   id: number;
 
-  @Column({ type: 'int', default: 0 })
-  male_toilet: number;
+  @OneToOne(() => Toilet, (toilet) => toilet.facility, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'toilet_id' })
+  toilet: Toilet;
 
   @Column({ type: 'int', default: 0 })
-  male_urinal: number;
+  male_toilet_count: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_male_toilet: number;
+  male_urinal_count: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_male_urinal: number;
+  disabled_male_toilet_count: number;
 
   @Column({ type: 'int', default: 0 })
-  kids_toilet_male: number;
+  disabled_male_urinal_count: number;
 
   @Column({ type: 'int', default: 0 })
-  female_toilet: number;
+  kids_male_toilet_count: number;
 
   @Column({ type: 'int', default: 0 })
-  disabled_female_toilet: number;
+  female_toilet_count: number;
 
   @Column({ type: 'int', default: 0 })
-  kids_toilet_female: number;
+  disabled_female_toilet_count: number;
+
+  @Column({ type: 'int', default: 0 })
+  kids_female_toilet_count: number;
 
   @Column({ type: 'varchar', length: 1, default: 'N' })
   emergency_bell: string;
@@ -50,13 +56,9 @@ export class ToiletFacility {
   @Column({ type: 'date' })
   reference_date: Date;
 
-  @OneToOne(() => Toilet, (toilet) => toilet.facility)
-  @JoinColumn({ name: 'toilet_id' })
-  toilet: Toilet;
-
-  @CreateDateColumn({ type: 'date' })
+  @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'date' })
+  @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
 }
