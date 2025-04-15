@@ -39,7 +39,7 @@ export class Comment {
   comment: string;
 
   @Column({ type: 'boolean', default: false })
-  is_deleted: boolean;
+  deleted: boolean;
 
   @CreateDateColumn({ type: 'date' })
   created_at: Date;

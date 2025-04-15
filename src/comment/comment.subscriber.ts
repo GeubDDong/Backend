@@ -21,61 +21,45 @@ export class CommentSubscriber implements EntitySubscriberInterface<Comment> {
   }
 
   async afterInsert(event: InsertEvent<Comment>): Promise<void> {
-    const commentId = event.entity?.id;
-    if (!commentId) return;
-
-    const comment = await event.manager.getRepository(Comment).findOne({
-      where: { id: commentId },
-      relations: ['toilet'],
-    });
-
-    if (comment) {
-      const avg =
-        (comment.rating_cleanliness +
-          comment.rating_amenities +
-          comment.rating_accessibility) /
-        3;
-      const roundedAvg = Math.round(avg * 10) / 10;
-
-      await event.manager.getRepository(Comment).update(comment.id, {
-        avg_rating: roundedAvg,
-      });
-
-      await this.updateToiletAverages(event.manager, comment.toilet.id);
-    }
+    await this.handleCommentChange(event.manager, event.entity?.id);
   }
 
   async afterUpdate(event: UpdateEvent<Comment>): Promise<void> {
-    const commentId = event.entity?.id;
+    await this.handleCommentChange(event.manager, event.entity?.id);
+  }
+
+  private async handleCommentChange(
+    manager: EntityManager,
+    commentId?: number,
+  ) {
     if (!commentId) return;
 
-    const comment = await event.manager.getRepository(Comment).findOne({
+    const comment = await manager.getRepository(Comment).findOne({
       where: { id: commentId },
       relations: ['toilet'],
     });
 
-    if (comment) {
-      const avg =
-        (comment.rating_cleanliness +
-          comment.rating_amenities +
-          comment.rating_accessibility) /
-        3;
+    if (!comment) return;
 
-      const roundedAvg = Math.round(avg * 10) / 10;
+    const avgRating = this.calculateAvgRating(comment);
+    await manager.getRepository(Comment).update(comment.id, {
+      avg_rating: avgRating,
+    });
 
-      await event.manager.getRepository(Comment).update(comment.id, {
-        avg_rating: roundedAvg,
-      });
+    await this.updateToiletAverages(manager, comment.toilet.id);
+  }
 
-      await this.updateToiletAverages(event.manager, comment.toilet.id);
-    }
+  private calculateAvgRating(comment: Comment): number {
+    const { rating_cleanliness, rating_amenities, rating_accessibility } =
+      comment;
+    const avg =
+      (rating_cleanliness + rating_amenities + rating_accessibility) / 3;
+    return Math.round(avg * 10) / 10;
   }
 
   async updateToiletAverages(manager: EntityManager, toiletId: number) {
-    if (!toiletId) return;
-
     const comments = await manager.getRepository(Comment).find({
-      where: { toilet: { id: toiletId }, is_deleted: false },
+      where: { toilet: { id: toiletId }, deleted: false },
     });
 
     if (comments.length === 0) {
@@ -88,31 +72,28 @@ export class CommentSubscriber implements EntitySubscriberInterface<Comment> {
       return;
     }
 
-    let sumClean = 0;
-    let sumAmenity = 0;
-    let sumAccess = 0;
-    for (const c of comments) {
-      sumClean += c.rating_cleanliness;
-      sumAmenity += c.rating_amenities;
-      sumAccess += c.rating_accessibility;
-    }
+    const sum = comments.reduce(
+      (acc, c) => {
+        acc.clean += c.rating_cleanliness;
+        acc.amenity += c.rating_amenities;
+        acc.access += c.rating_accessibility;
+        return acc;
+      },
+      { clean: 0, amenity: 0, access: 0 },
+    );
 
     const count = comments.length;
-    const avgClean = sumClean / count;
-    const avgAmenity = sumAmenity / count;
-    const avgAccess = sumAccess / count;
-
-    const avgCleanRounded = Math.round(avgClean * 10) / 10;
-    const avgAmenityRounded = Math.round(avgAmenity * 10) / 10;
-    const avgAccessRounded = Math.round(avgAccess * 10) / 10;
-    const avgRating =
+    const avgClean = Math.round((sum.clean / count) * 10) / 10;
+    const avgAmenity = Math.round((sum.amenity / count) * 10) / 10;
+    const avgAccess = Math.round((sum.access / count) * 10) / 10;
+    const avgTotal =
       Math.round(((avgClean + avgAmenity + avgAccess) / 3) * 10) / 10;
 
     await manager.getRepository(Toilet).update(toiletId, {
-      avg_cleanliness: avgCleanRounded,
-      avg_amenities: avgAmenityRounded,
-      avg_accessibility: avgAccessRounded,
-      avg_rating: avgRating,
+      avg_cleanliness: avgClean,
+      avg_amenities: avgAmenity,
+      avg_accessibility: avgAccess,
+      avg_rating: avgTotal,
     });
   }
 }
