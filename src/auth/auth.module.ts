@@ -14,6 +14,7 @@ import { JwtStrategy } from 'src/util/strategy/jwt.strategy';
 import { RefreshJwtStrategy } from 'src/util/strategy/refresh.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
+import { UsersModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
     ConfigModule.forFeature(refreshJwtConfig),
     ConfigModule.forFeature(kakaoOauthConfig),
     AuthModule,
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [
