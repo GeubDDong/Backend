@@ -19,6 +19,8 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { CreateCommentDto } from 'src/dto/comment/create.comment.dto';
+import { UpdateCommentDto } from 'src/dto/comment/update.comment.dto';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -41,8 +43,8 @@ export class CommentController {
     @Param('toiletId', ParseIntPipe) toiletId: number,
     @Req() req: Request,
   ) {
-    const userId = req.user.id;
-    return this.CommentService.getComments(toiletId, userId);
+    const { socialId } = req.user;
+    return this.CommentService.getComments(toiletId, socialId);
   }
 
   @Post(':toiletId')
@@ -61,13 +63,13 @@ export class CommentController {
   })
   async addComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Body() body: { comment: string },
+    @Body() createCommentDto: CreateCommentDto,
     @Req() req: Request,
   ) {
-    const userId = Number(req.user.id);
-    const { comment } = body;
+    const { socialId } = req.user;
+    const { comment, rating } = createCommentDto;
 
-    await this.CommentService.addComment(toiletId, userId, comment);
+    await this.CommentService.addComment(toiletId, socialId, comment, rating);
 
     return { statusCode: 201, message: 'comment created successfully' };
   }
@@ -88,19 +90,25 @@ export class CommentController {
   })
   async updateComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Body() body: { id: number; comment: string },
+    @Body() updateCommentDto: UpdateCommentDto,
     @Req() req: Request,
   ) {
-    const userId = Number(req.user.id);
+    const { socialId } = req.user;
 
-    const { id: commentId, comment } = body;
+    const { commentId, comment, rating } = updateCommentDto;
 
-    await this.CommentService.updateComment(userId, commentId, comment);
+    await this.CommentService.updateComment(
+      toiletId,
+      socialId,
+      commentId,
+      comment,
+      rating,
+    );
 
     return { statusCode: 200, message: 'comment updated successfully' };
   }
 
-  @Delete(':toiletId/:commentId')
+  @Delete(':toiletId')
   @HttpCode(200)
   @ApiBearerAuth()
   @ApiOperation({ summary: '댓글 삭제' })
@@ -114,15 +122,15 @@ export class CommentController {
       },
     },
   })
-  async deleteComment(
+  async removeComment(
     @Param('toiletId', ParseIntPipe) toiletId: number,
-    @Param('commentId', ParseIntPipe) commentId: number,
+    @Body('commentId') commentId: number,
     @Req() req: Request,
   ) {
-    const userId = Number(req.user.id);
+    const { socialId } = req.user;
 
-    await this.CommentService.deleteComment(userId, commentId, toiletId);
+    await this.CommentService.removeComment(socialId, commentId, toiletId);
 
-    return { statusCode: 200, message: 'comment deleted successfully' };
+    return { statusCode: 201, message: 'comment removed successfully' };
   }
 }

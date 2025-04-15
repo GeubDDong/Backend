@@ -1,15 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'src/cache/redis.service';
-import { Comment } from 'src/entity/comment.entity';
-import { Repository } from 'typeorm';
+import { CommentsRepository } from './comment.repository';
+import { Comment as CommentEntity } from '../entity/comment.entity';
+import { UsersRepository } from 'src/user/user.repository';
+import { RatingDto } from 'src/dto/comment/create.comment.dto';
 
 @Injectable()
 export class CommentService {
   constructor(
-    @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>,
     private readonly redisService: RedisService,
+    private readonly commentsRepository: CommentsRepository,
+    private readonly usersRepository: UsersRepository,
   ) {}
 
   async getCommentsPublic(toiletId: number): Promise<any> {
@@ -17,31 +18,20 @@ export class CommentService {
     const cached = await this.redisService.get(cacheKey);
     if (cached) return cached;
 
-    const comments = await this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoin('comment.user', 'user')
-      .select([
-        'comment.id',
-        'comment.comment',
-        'comment.updated_at',
-        'user.email',
-        'user.nickname',
-      ])
-      .where('comment.toilet_id = :toiletId', { toiletId })
-      // .orderBy('comment.updated_at', 'DESC') // 최신순 정렬 필요 시 주석 해제
-      .getMany();
+    const comments = await this.commentsRepository.findCommentsPublic(toiletId);
 
     if (!comments.length) {
       return { statusCode: 200, message: '등록된 댓글이 없습니다.' };
     }
 
     const result = {
-      totalComments: comments.length,
       comments: comments.map((comment) => ({
         id: comment.id,
-        user_email: comment.user.email,
+        profile_image: comment.user.profile_image,
+        avg_rating: comment.avg_rating,
         nickname: comment.user.nickname,
         comment: comment.comment,
+        created_at: comment.created_at,
         updated_at: comment.updated_at,
       })),
     };
@@ -50,39 +40,36 @@ export class CommentService {
     return result;
   }
 
-  async getComments(toiletId: number, userId: string): Promise<any> {
-    const cacheKey = `comments:user:${userId}:toilet:${toiletId}`;
+  async getComments(toiletId: number, socialId: string): Promise<any> {
+    const cacheKey = `comments:user:${socialId}:toilet:${toiletId}`;
     const cached = await this.redisService.get(cacheKey);
     if (cached) return cached;
 
-    const comments = await this.commentRepository
-      .createQueryBuilder('comment')
-      .leftJoin('comment.user', 'user')
-      .select([
-        'comment.id',
-        'comment.comment',
-        'comment.updated_at',
-        'user.email',
-        'user.nickname',
-        'user.id',
-      ])
-      .where('comment.toilet_id = :toiletId', { toiletId })
-      // .orderBy('comment.updated_at', 'DESC') // 최신순 정렬 필요 시 주석 해제
-      .getMany();
+    const [user, comments] = await Promise.all([
+      this.usersRepository.findBySocialId(socialId),
+      this.commentsRepository.findCommentsBySocialId(toiletId, socialId),
+    ]);
+
+    if (!user) {
+      throw new NotFoundException('유저를 찾을 수 없습니다.');
+    }
 
     if (!comments.length) {
       return { statusCode: 200, message: '등록된 댓글이 없습니다.' };
     }
 
+    const userId = user.id;
+
     const result = {
-      totalComments: comments.length,
       comments: comments.map((comment) => ({
         id: comment.id,
-        user_email: comment.user.email,
+        profile_image: comment.user.profile_image,
+        avg_rating: comment.avg_rating,
         nickname: comment.user.nickname,
         comment: comment.comment,
+        created_at: comment.created_at,
         updated_at: comment.updated_at,
-        isMine: comment.user.id === Number(userId),
+        isMine: comment.user.id === userId,
       })),
     };
 
@@ -90,57 +77,105 @@ export class CommentService {
     return result;
   }
 
-  async addComment(toiletId: number, userId: number, comment: string) {
-    const newComment = this.commentRepository.create({
-      toilet: { id: toiletId },
-      user: { id: userId },
-      comment,
-    });
+  async addComment(
+    toiletId: number,
+    socialId: string,
+    comment: string,
+    rating: RatingDto,
+  ) {
+    const user = await this.usersRepository.findBySocialId(socialId);
 
-    const saved = await this.commentRepository.save(newComment);
+    if (!user) {
+      throw new NotFoundException('유저를 찾을 수 없습니다.');
+    }
+
+    const userId = user.id;
+
+    const saved = await this.commentsRepository.createComment(
+      userId,
+      toiletId,
+      comment,
+      rating,
+    );
+
     await this.invalidateCommentCache(toiletId);
+
     return saved;
   }
 
   async updateComment(
-    userId: number,
+    toiletId: number,
+    socialId: string,
     commentId: number,
     comment: string,
-  ): Promise<Comment> {
-    const existingComment = await this.commentRepository.findOne({
-      where: { id: commentId, user: { id: userId } },
-    });
+    rating: {
+      cleanliness: number;
+      amenities: number;
+      accessibility: number;
+    },
+  ): Promise<CommentEntity> {
+    // 유저 검증
+    const user = await this.usersRepository.findBySocialId(socialId);
+
+    if (!user) {
+      throw new NotFoundException('유저를 찾을 수 없습니다.');
+    }
+
+    const userId = user.id;
+
+    // 유저 화장실의 댓글 확인
+    const existingComment =
+      await this.commentsRepository.findCommentByUsersToiletId(
+        toiletId,
+        commentId,
+        userId,
+      );
 
     if (!existingComment) {
       throw new NotFoundException(`${commentId}번 댓글을 찾을 수 없습니다.`);
     }
 
     existingComment.comment = comment;
-    const updated = await this.commentRepository.save(existingComment);
+    const updated = await this.commentsRepository.updateComment(
+      existingComment,
+      rating,
+    );
 
     await this.invalidateCommentCache(existingComment.toilet.id, userId);
     return updated;
   }
 
-  async deleteComment(
-    userId: number,
+  async removeComment(
+    social_id: string,
     commentId: number,
     toiletId: number,
-  ): Promise<void> {
-    const existingComment = await this.commentRepository.findOne({
-      where: {
-        id: commentId,
-        user: { id: userId },
-        toilet: { id: toiletId },
-      },
-    });
+  ): Promise<CommentEntity> {
+    const user = await this.usersRepository.findBySocialId(social_id);
+
+    if (!user) {
+      throw new NotFoundException('유저를 찾을 수 없습니다.');
+    }
+
+    const userId = user.id;
+
+    // 유저 화장실의 댓글 확인
+    const existingComment =
+      await this.commentsRepository.findCommentByUsersToiletId(
+        toiletId,
+        commentId,
+        userId,
+      );
 
     if (!existingComment) {
       throw new NotFoundException(`${commentId}번 댓글을 찾을 수 없습니다.`);
     }
 
-    await this.commentRepository.delete(commentId);
+    const removed =
+      await this.commentsRepository.removeComment(existingComment);
+
     await this.invalidateCommentCache(toiletId, userId);
+
+    return removed;
   }
 
   private async invalidateCommentCache(toiletId: number, userId?: number) {
