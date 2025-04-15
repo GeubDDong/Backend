@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CookieOptions, Request, Response } from 'express';
 import { Public } from 'src/decorator/public.decorator';
-import { SetNicknameDto } from 'src/dto/set.nickname.dto';
+import { SetNicknameDto } from 'src/dto/auth/set.nickname.dto';
 
 @Controller('auth')
 export class AuthController {

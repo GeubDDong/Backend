@@ -54,7 +54,7 @@ export class ToiletService {
         let liked = { like: false };
 
         if (userEmail) {
-          const result = await this.likeService.getLikes(toilet.id, userEmail);
+          const result = await this.likeService.getLiked(toilet.id, userEmail);
           liked = { like: result.like };
         }
 
