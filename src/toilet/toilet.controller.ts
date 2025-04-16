@@ -3,7 +3,7 @@ import { Public } from 'src/decorator/public.decorator';
 import { ToiletService } from './toilet.service';
 import { Request } from 'express';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ToiletDto } from 'src/dto/toilet.dto';
+import { ToiletRequestDto } from 'src/dto/toilet/request/toilet-request.dto';
 
 @ApiTags('Toilet')
 @Controller('toilet')
@@ -15,7 +15,7 @@ export class ToiletController {
   @ApiResponse({
     status: 200,
     description: '회원요청 (비회원 요청일 경우 liked.like:false 유지)',
-    type: ToiletDto,
+    type: ToiletRequestDto,
     isArray: true,
   })
   @ApiResponse({
