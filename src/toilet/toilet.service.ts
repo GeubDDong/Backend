@@ -1,74 +1,94 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Toilet } from 'src/entity/toilet.entity';
-import { ToiletDto } from '../dto/toilet.dto';
 import { FavoritesService } from 'src/favorite/favorites.service';
 import { RedisService } from 'src/cache/redis.service';
+import { ToiletMapResponseDto } from 'src/dto/toilet/toilet-response.dto';
+import { ToiletRepository } from './toilet.repository';
+import { ToiletFilterDto } from 'src/dto/toilet/request/toilet-filter.dto';
 
 @Injectable()
 export class ToiletService {
   constructor(
-    @InjectRepository(Toilet)
-    private readonly toiletRepository: Repository<Toilet>,
+    private readonly toiletRepository: ToiletRepository,
     private readonly favoritesService: FavoritesService,
     private readonly redisService: RedisService,
   ) {}
 
   async getToilets(
-cenLat: number, cenLng: number, top: number, bottom: number, left: number, right: number, userEmail?: string, filters?: any, p0?: { hasMaleToilet: boolean | undefined; hasFemaleToilet: boolean | undefined; hasDisabledToilet: boolean | undefined; hasKidsToilet: boolean | undefined; hasCCTV: boolean | undefined; hasEmergencyBell: boolean | undefined; hasDiaperChangingStation: boolean | undefined; },
-  ): Promise<ToiletDto[]> {
-    const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userEmail || 'public'}`;
-    const cached = await this.redisService.get<ToiletDto[]>(cacheKey);
+    cenLat: number,
+    cenLng: number,
+    top: number,
+    bottom: number,
+    left: number,
+    right: number,
+    userSocialId?: string,
+    filters?: ToiletFilterDto,
+  ): Promise<{ groups: ToiletMapResponseDto[] }> {
+    const filterKey = Object.entries(filters || {})
+      .filter(([, v]) => v !== undefined)
+      .map(([k, v]) => `${k}=${v}`)
+      .join('|');
+
+    const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userSocialId || 'public'}:filters:${filterKey}`;
+    const cached = await this.redisService.get<{
+      groups: ToiletMapResponseDto[];
+    }>(cacheKey);
 
     if (cached) {
       return cached;
     }
 
-    console.log('db에서 가져옴');
-    const toilets = await this.toiletRepository
-      .createQueryBuilder('toilet')
-      .leftJoinAndSelect('toilet.management', 'management')
-      .leftJoinAndSelect('toilet.facility', 'facility')
-      .addSelect(
-        `ST_DistanceSphere(
-          ST_MakePoint(toilet.longitude::float8, toilet.latitude::float8),
-          ST_MakePoint(CAST(:cenLng AS float8), CAST(:cenLat AS float8))
-        )`,
-        'distance',
-      )
-      .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
-      .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
-      .setParameters({ cenLat, cenLng })
-      .orderBy('distance', 'ASC')
-      .getMany();
+    const toilets = await this.toiletRepository.findToiletsInBounds(
+      cenLat,
+      cenLng,
+      top,
+      bottom,
+      left,
+      right,
+      filters,
+    );
 
-    const result = await Promise.all(
-      toilets.map(async (toilet, index) => {
-        let liked = { like: false };
-
-        if (userEmail) {
+    const toiletDtos = await Promise.all(
+      toilets.map(async (toilet) => {
+        let isLiked = false;
+        if (userSocialId) {
           const result = await this.favoritesService.getLiked(
             toilet.id,
-            userEmail,
+            userSocialId,
           );
-          liked = { like: result.like };
+          isLiked = result.like;
         }
-
         return {
           id: toilet.id,
           name: toilet.name,
-          street_address: toilet.street_address,
-          lot_address: toilet.lot_address,
-          latitude: toilet.latitude,
-          longitude: toilet.longitude,
-          open_hours: toilet.open_hour,
-          liked,
-          nearest: index === 0,
+          is_liked: isLiked,
+          marker_latitude: Number(toilet.latitude.toFixed(4)),
+          marker_longitude: Number(toilet.longitude.toFixed(4)),
         };
       }),
     );
-    await this.redisService.set(cacheKey, result, 300);
-    return result;
+
+    const grouped: Record<string, ToiletMapResponseDto> = {};
+    for (const toilet of toiletDtos) {
+      const key = `${toilet.marker_latitude}-${toilet.marker_longitude}`;
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          marker_latitude: toilet.marker_latitude,
+          marker_longitude: toilet.marker_longitude,
+          toilets: [],
+        };
+      }
+      grouped[key].toilets.push({
+        id: toilet.id,
+        name: toilet.name,
+        is_liked: toilet.is_liked,
+      });
+    }
+
+    const response = {
+      groups: Object.values(grouped),
+    };
+    await this.redisService.set(cacheKey, response, 300);
+    return response;
   }
 }

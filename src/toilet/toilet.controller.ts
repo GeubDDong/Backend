@@ -1,9 +1,8 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req } from '@nestjs/common';
 import { Public } from 'src/decorator/public.decorator';
 import { ToiletService } from './toilet.service';
 import { Request } from 'express';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ToiletRequestDto } from 'src/dto/toilet/request/toilet-request.dto';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Toilet')
 @Controller('toilet')
@@ -36,17 +35,17 @@ export class ToiletController {
     @Query('bottom') bottom: number,
     @Query('left') left: number,
     @Query('right') right: number,
-    @Query('has_male_toilet') hasMaleToilet?: boolean,
-    @Query('has_female_toilet') hasFemaleToilet?: boolean,
-    @Query('has_disabled_toilet') hasDisabledToilet?: boolean,
-    @Query('has_kids_toilet') hasKidsToilet?: boolean,
-    @Query('has_cctv') hasCCTV?: boolean,
-    @Query('has_emergency_bell') hasEmergencyBell?: boolean,
-    @Query('has_diaper_changing_station')
-    hasDiaperChangingStation?: boolean
     @Req() req: Request,
+    @Query('has_male_toilet') has_male_toilet?: boolean,
+    @Query('has_female_toilet') has_female_toilet?: boolean,
+    @Query('has_disabled_toilet') has_disabled_toilet?: boolean,
+    @Query('has_kids_toilet') has_kids_toilet?: boolean,
+    @Query('has_cctv') has_cctv?: boolean,
+    @Query('has_emergency_bell') has_emergency_bell?: boolean,
+    @Query('has_diaper_changing_station') has_diaper_changing_station?: boolean,
   ) {
     const userSocialId = req.user?.socialId ?? undefined;
+
     return await this.toiletService.getToilets(
       cenLat,
       cenLng,
@@ -55,15 +54,15 @@ export class ToiletController {
       left,
       right,
       userSocialId,
-      filters:{
-        hasMaleToilet,
-        hasFemaleToilet,
-        hasDisabledToilet,
-        hasKidsToilet,
-        hasCCTV,
-        hasEmergencyBell,
-        hasDiaperChangingStation
-      }
+      {
+        has_male_toilet,
+        has_female_toilet,
+        has_disabled_toilet,
+        has_kids_toilet,
+        has_cctv,
+        has_emergency_bell,
+        has_diaper_changing_station,
+      },
     );
   }
 }
