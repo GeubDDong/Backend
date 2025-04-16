@@ -16,13 +16,7 @@ export class ToiletService {
   ) {}
 
   async getToilets(
-    cenLat: number,
-    cenLng: number,
-    top: number,
-    bottom: number,
-    left: number,
-    right: number,
-    userEmail?: string,
+cenLat: number, cenLng: number, top: number, bottom: number, left: number, right: number, userEmail?: string, filters?: any, p0?: { hasMaleToilet: boolean | undefined; hasFemaleToilet: boolean | undefined; hasDisabledToilet: boolean | undefined; hasKidsToilet: boolean | undefined; hasCCTV: boolean | undefined; hasEmergencyBell: boolean | undefined; hasDiaperChangingStation: boolean | undefined; },
   ): Promise<ToiletDto[]> {
     const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userEmail || 'public'}`;
     const cached = await this.redisService.get<ToiletDto[]>(cacheKey);

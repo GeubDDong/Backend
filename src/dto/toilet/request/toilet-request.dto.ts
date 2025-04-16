@@ -64,5 +64,5 @@ export class ToiletRequestDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsBoolean()
-  has_diaper_table?: boolean;
+  diaper_changing_station?: boolean;
 }
