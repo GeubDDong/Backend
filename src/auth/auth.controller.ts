@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  Get,
-  Header,
-  HttpCode,
+  Param,
   Post,
   Req,
   Res,
@@ -13,68 +11,48 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CookieOptions, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { Public } from 'src/decorator/public.decorator';
 import { SetNicknameDto } from 'src/dto/auth/set.nickname.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  @Public()
-  @Get('kakaoLogin')
-  @Header('Content-Type', 'text/html')
-  getKakaoLoginPage(): string {
-    return `
-    <div>
-        <h1>카카오 로그인</h1>
-
-        <form action="/auth/login/kakao" method="GET">
-            <input type="submit" value="카카오로그인" />
-        </form>
-
-        <form action="/auth/logout" method="POST">
-            <input type="submit" value="카카오로그아웃 및 연결 끊기" />
-        </form>
-    </div>
-    `;
-  }
-  @Public()
-  @UseGuards(AuthGuard('kakao'))
-  @Get('login/:provider')
-  checkProvider() {}
 
   @Public()
-  @Get('kakao-callback')
-  @UseGuards(AuthGuard('kakao'))
-  @HttpCode(302)
-  async kakaoLogin(
-    @Req()
-    req: Request,
+  @Post('login/:provider')
+  async socialLogin(
+    @Param('provider') provider: string,
+    @Body() body: { code: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const socialId = req.user.socialId;
+    const { user, socialId, isNewUser } =
+      await this.authService.getOAuthUserByCode(
+        provider as 'kakao' | 'google',
+        body.code,
+      );
 
     const { accessToken, refreshToken } =
       await this.authService.getStoreTokens(socialId);
 
-    const cookieOptions: CookieOptions = { httpOnly: true, secure: true };
-    res.cookie('refreshToken', refreshToken, cookieOptions);
-
-    // if (user.isNewUser) {
-    //   return res.redirect(
-    //     `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}&flag=newUser`,
-    //   );
-    // }
-
-    // return res.redirect(
-    //   `https://geubddong-deploy.vercel.app/auth/callback?accessToken=${accessToken}`,
-    // );
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
 
     return {
       statusCode: 200,
       message: 'login successful',
+      refreshToken, // 테스트용
       accessToken,
-      refreshToken,
+      isNewUser,
+      user: {
+        user_id: user.id,
+        email: user.email,
+        nickname: user.nickname,
+        profile_image: user.profile_image,
+        provider: user.provider,
+      },
     };
   }
 
