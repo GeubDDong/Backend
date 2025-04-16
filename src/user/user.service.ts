@@ -15,10 +15,6 @@ export class UsersService {
   async findBySocialId(socialId: string): Promise<User | null> {
     const existUser = await this.usersRepository.findBySocialId(socialId);
 
-    if (!existUser) {
-      throw new NotFoundException('유저를 찾을 수 없습니다.');
-    }
-
     return existUser;
   }
 

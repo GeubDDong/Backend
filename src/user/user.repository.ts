@@ -29,7 +29,14 @@ export class UsersRepository {
   }
 
   async createUser(createUserDto: CreateUserDto) {
-    const result = await this.usersRepository.save(createUserDto);
+    const newUser = this.usersRepository.create({
+      social_id: createUserDto.socialId,
+      email: createUserDto.email,
+      profile_image: createUserDto.profile_image,
+      provider: createUserDto.provider,
+    });
+
+    const result = await this.usersRepository.save(newUser);
 
     return result;
   }
@@ -43,8 +50,6 @@ export class UsersRepository {
   }
 
   async setNickname(socialId: string, nickname: string) {
-    console.log('userRepositor socialID', socialId);
-
     const result = await this.usersRepository.update(
       { social_id: socialId },
       { nickname },

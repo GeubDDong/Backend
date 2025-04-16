@@ -23,6 +23,7 @@
     "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/configs/data-source.ts"
   },
   "dependencies": {
+    "@nestjs/axios": "^4.0.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.1",

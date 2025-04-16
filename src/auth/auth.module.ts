@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '@nestjs/config';
-import kakaoOauthConfig from 'src/configs/auth/kakao.oauth.config';
 import { KakaoStrategy } from 'src/util/strategy/kakao.strategy';
 import jwtConfig from 'src/configs/auth/jwt.config';
 import { JwtModule } from '@nestjs/jwt';
@@ -15,6 +14,9 @@ import { RefreshJwtStrategy } from 'src/util/strategy/refresh.strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from 'src/util/guards/jwt-auth/jwt-auth.guard';
 import { UsersModule } from 'src/user/user.module';
+import { HttpModule } from '@nestjs/axios';
+import oauthConfig from 'src/configs/auth/oauth.config';
+import kakaoOauthConfig from 'src/configs/auth/kakao.oauth.config';
 
 @Module({
   imports: [
@@ -22,9 +24,11 @@ import { UsersModule } from 'src/user/user.module';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
+    ConfigModule.forFeature(oauthConfig),
     ConfigModule.forFeature(kakaoOauthConfig),
     AuthModule,
     UsersModule,
+    HttpModule,
   ],
   controllers: [AuthController],
   providers: [
