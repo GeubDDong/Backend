@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { Public } from 'src/decorator/public.decorator';
 import { SetNicknameDto } from 'src/dto/auth/set.nickname.dto';
+import { OAuthProvider } from 'src/configs/auth/oauth.provider';
 
 @Controller('auth')
 export class AuthController {
@@ -22,15 +23,12 @@ export class AuthController {
   @Public()
   @Post('login/:provider')
   async socialLogin(
-    @Param('provider') provider: string,
+    @Param('provider') provider: OAuthProvider,
     @Body() body: { code: string },
     @Res({ passthrough: true }) res: Response,
   ) {
     const { user, socialId, isNewUser } =
-      await this.authService.getOAuthUserByCode(
-        provider as 'kakao' | 'google',
-        body.code,
-      );
+      await this.authService.getOAuthUserByCode(provider, body.code);
 
     const { accessToken, refreshToken } =
       await this.authService.getStoreTokens(socialId);
