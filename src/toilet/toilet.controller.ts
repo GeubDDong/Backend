@@ -1,9 +1,8 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Req } from '@nestjs/common';
 import { Public } from 'src/decorator/public.decorator';
 import { ToiletService } from './toilet.service';
 import { Request } from 'express';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ToiletDto } from 'src/dto/toilet.dto';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Toilet')
 @Controller('toilet')
@@ -12,15 +11,22 @@ export class ToiletController {
 
   @Public()
   @Get()
-  @ApiResponse({
-    status: 200,
-    description: '회원요청 (비회원 요청일 경우 liked.like:false 유지)',
-    type: ToiletDto,
-    isArray: true,
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden',
+  @ApiQuery({ name: 'cenLat', required: true, type: Number })
+  @ApiQuery({ name: 'cenLng', required: true, type: Number })
+  @ApiQuery({ name: 'top', required: true, type: Number })
+  @ApiQuery({ name: 'bottom', required: true, type: Number })
+  @ApiQuery({ name: 'left', required: true, type: Number })
+  @ApiQuery({ name: 'right', required: true, type: Number })
+  @ApiQuery({ name: 'has_male_toilet', required: false, type: Boolean })
+  @ApiQuery({ name: 'has_female_toilet', required: false, type: Boolean })
+  @ApiQuery({ name: 'has_disabled_toilet', required: false, type: Boolean })
+  @ApiQuery({ name: 'has_kids_toilet', required: false, type: Boolean })
+  @ApiQuery({ name: 'has_cctv', required: false, type: Boolean })
+  @ApiQuery({ name: 'has_emergency_bell', required: false, type: Boolean })
+  @ApiQuery({
+    name: 'has_diaper_changing_station',
+    required: false,
+    type: Boolean,
   })
   async getToilets(
     @Query('cenLat') cenLat: number,
@@ -30,8 +36,16 @@ export class ToiletController {
     @Query('left') left: number,
     @Query('right') right: number,
     @Req() req: Request,
+    @Query('has_male_toilet') has_male_toilet?: boolean,
+    @Query('has_female_toilet') has_female_toilet?: boolean,
+    @Query('has_disabled_toilet') has_disabled_toilet?: boolean,
+    @Query('has_kids_toilet') has_kids_toilet?: boolean,
+    @Query('has_cctv') has_cctv?: boolean,
+    @Query('has_emergency_bell') has_emergency_bell?: boolean,
+    @Query('has_diaper_changing_station') has_diaper_changing_station?: boolean,
   ) {
-    const userEmail = req.user?.email ?? undefined;
+    const userSocialId = req.user?.socialId ?? undefined;
+
     return await this.toiletService.getToilets(
       cenLat,
       cenLng,
@@ -39,7 +53,16 @@ export class ToiletController {
       bottom,
       left,
       right,
-      userEmail,
+      userSocialId,
+      {
+        has_male_toilet,
+        has_female_toilet,
+        has_disabled_toilet,
+        has_kids_toilet,
+        has_cctv,
+        has_emergency_bell,
+        has_diaper_changing_station,
+      },
     );
   }
 }

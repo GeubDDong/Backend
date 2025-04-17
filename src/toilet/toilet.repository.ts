@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Toilet } from '../entity/toilet.entity';
-import { Favorite } from 'src/entity/favorite.entity';
 import { DataSource, Repository } from 'typeorm';
+import { ToiletFilterDto } from 'src/dto/toilet/request/toilet-filter.dto';
 
 @Injectable()
 export class ToiletRepository {
@@ -12,62 +12,79 @@ export class ToiletRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findToilets(
+  async findToiletsInBounds(
     cenLat: number,
     cenLng: number,
     top: number,
     bottom: number,
     left: number,
     right: number,
-    userEmail?: string,
-  ) {
-    const qb = this.dataSource
-      .createQueryBuilder()
-      .select([
-        'toilet.id AS id',
-        'toilet.name AS name',
-        'toilet.latitude AS latitude',
-        'toilet.longitude AS longitude',
-        'toilet.street_address AS street_address',
-        'toilet.lot_address AS lot_address',
-        'toilet.open_hour AS open_hour',
-        `ST_DistanceSphere(ST_MakePoint(toilet.longitude, toilet.latitude), ST_MakePoint(:cenLng, :cenLat)) AS distance`,
-        userEmail
-          ? `CASE WHEN "likes"."id" IS NOT NULL THEN TRUE ELSE FALSE END AS liked`
-          : `FALSE AS liked`,
-      ])
-      .from(Toilet, 'toilet')
-      .leftJoin(
-        Favorite,
-        'likes',
-        'likes.toilet_id = toilet.id AND likes.user_id = :userEmail',
-        {
-          userEmail,
-        },
+    filters?: ToiletFilterDto,
+  ): Promise<Toilet[]> {
+    const qb = this.toiletRepository
+      .createQueryBuilder('toilet')
+      .leftJoinAndSelect('toilet.facility', 'facility')
+      .leftJoinAndSelect('toilet.management', 'management')
+      .addSelect(
+        `ST_DistanceSphere(
+          ST_MakePoint(toilet.longitude::float8, toilet.latitude::float8),
+          ST_MakePoint(CAST(:cenLng AS float8), CAST(:cenLat AS float8))
+        )`,
+        'distance',
       )
       .where('toilet.latitude BETWEEN :bottom AND :top', { top, bottom })
       .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
-      .setParameters({ cenLat, cenLng })
-      .orderBy('distance', 'ASC')
-      .limit(10);
+      .setParameters({ cenLat, cenLng });
 
-    return await qb.getRawMany();
+    if (filters?.has_cctv === true) {
+      qb.andWhere(`facility.cctv = 'Y'`);
+    }
+
+    if (filters?.has_emergency_bell === true) {
+      qb.andWhere(`facility.emergency_bell = 'Y'`);
+    }
+
+    if (filters?.has_diaper_changing_station === true) {
+      qb.andWhere(`facility.diaper_changing_station = 'Y'`);
+    }
+
+    if (filters?.has_disabled_toilet === true) {
+      qb.andWhere(`(
+        facility.disabled_male_toilet > 0 OR
+        facility.disabled_female_toilet > 0
+      )`);
+    }
+
+    if (filters?.has_kids_toilet === true) {
+      qb.andWhere(`(
+        facility.kids_toilet_male > 0 OR
+        facility.kids_toilet_female > 0
+      )`);
+    }
+
+    if (filters?.has_male_toilet === true) {
+      qb.andWhere(`facility.male_toilet > 0`);
+    }
+
+    if (filters?.has_female_toilet === true) {
+      qb.andWhere(`facility.female_toilet > 0`);
+    }
+
+    return await qb.orderBy('distance', 'ASC').getMany();
+  }
+
+  async findOneByToiletId(id: number): Promise<Toilet | null> {
+    return await this.toiletRepository.findOne({ where: { id } });
   }
 
   async getLikeCount(toiletId: number): Promise<number> {
     const result = await this.dataSource
       .createQueryBuilder()
       .select('COUNT(*)', 'count')
-      .from(Favorite, 'likes')
+      .from('favorite', 'likes')
       .where('likes.toilet_id = :toiletId', { toiletId })
       .getRawOne();
 
     return Number(result?.count ?? 0);
-  }
-
-  async findOneByToiletId(id: number): Promise<Toilet | null> {
-    const result = await this.toiletRepository.findOne({ where: { id } });
-
-    return result;
   }
 }

@@ -18,6 +18,6 @@ import { User } from 'src/entity/user.entity';
     UsersRepository,
     ToiletRepository,
   ],
-  exports: [FavoriteRepository],
+  exports: [FavoriteRepository, FavoritesService],
 })
 export class FavoritesModule {}

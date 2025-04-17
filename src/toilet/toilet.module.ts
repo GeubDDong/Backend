@@ -5,7 +5,6 @@ import { Favorite } from 'src/entity/favorite.entity';
 import { ToiletController } from './toilet.controller';
 import { ToiletService } from './toilet.service';
 import { ToiletRepository } from './toilet.repository';
-import { FavoritesService } from 'src/favorite/favorites.service';
 import { RedisModule } from 'src/cache/redis.module';
 import { UsersModule } from 'src/user/user.module';
 import { FavoritesModule } from 'src/favorite/favorites.module';
@@ -18,7 +17,7 @@ import { FavoritesModule } from 'src/favorite/favorites.module';
     FavoritesModule,
   ],
   controllers: [ToiletController],
-  providers: [ToiletService, ToiletRepository, FavoritesService],
+  providers: [ToiletService, ToiletRepository],
   exports: [ToiletRepository],
 })
 export class ToiletModule {}
