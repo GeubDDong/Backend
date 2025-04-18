@@ -7,10 +7,16 @@ import {
 import { CreateUserDto } from 'src/dto/auth/create.user.dto';
 import { User } from '../entity/user.entity';
 import { UsersRepository } from './user.repository';
+import { lastValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
+import { generateRandomDigits } from 'src/util/common/random.util';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly httpService: HttpService,
+  ) {}
 
   async findBySocialId(socialId: string): Promise<User | null> {
     const existUser = await this.usersRepository.findBySocialId(socialId);
@@ -28,13 +34,41 @@ export class UsersService {
     return existUser;
   }
 
-  async createUser(createUserDto: CreateUserDto) {
-    const newUser = await this.usersRepository.createUser(createUserDto);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const nickname = await this.getRandomNickname();
+
+    const newUser = await this.usersRepository.createUser(
+      createUserDto,
+      nickname,
+    );
     if (!newUser) {
       throw new InternalServerErrorException('유저 생성에 실패했습니다.');
     }
 
     return newUser;
+  }
+
+  private async getRandomNickname(): Promise<string> {
+    try {
+      const { data } = await lastValueFrom(
+        this.httpService.post(
+          'https://www.rivestsoft.com/nickname/getRandomNickname.ajax',
+          {
+            lang: 'ko',
+          },
+        ),
+      );
+
+      const nickname = data.data;
+
+      const exists = await this.usersRepository.checkAlreadyNickname(nickname);
+
+      if (exists) return `${nickname}${generateRandomDigits(4)}`; // 중복이면 랜덤 숫자 생성
+
+      return nickname; // 중복 없으면 그대로 반환
+    } catch (e) {
+      return `User${generateRandomDigits(5)}`; // API 실패시 fallback
+    }
   }
 
   async storeHashedRefreshToken(

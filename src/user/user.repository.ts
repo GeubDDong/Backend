@@ -28,12 +28,13 @@ export class UsersRepository {
     return result;
   }
 
-  async createUser(createUserDto: CreateUserDto) {
+  async createUser(createUserDto: CreateUserDto, nickname: string) {
     const newUser = this.usersRepository.create({
       social_id: createUserDto.socialId,
       email: createUserDto.email,
       profile_image: createUserDto.profile_image,
       provider: createUserDto.provider,
+      nickname,
     });
 
     const result = await this.usersRepository.save(newUser);
