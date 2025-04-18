@@ -38,11 +38,14 @@ export class AuthController {
       secure: true,
     });
 
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
     return {
       statusCode: 200,
       message: 'login successful',
-      refreshToken, // 테스트용
-      accessToken,
       isNewUser,
       user: {
         user_id: user.id,
@@ -79,6 +82,7 @@ export class AuthController {
     const { statusCode, message } = await this.authService.logout(socialId);
 
     res.clearCookie('refreshToken');
+    res.clearCookie('accessToken');
 
     return { statusCode, message };
   }
