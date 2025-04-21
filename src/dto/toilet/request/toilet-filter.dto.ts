@@ -5,22 +5,22 @@ export class ToiletFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_emergency_bell?: boolean;
+  has_male_toilet?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_cctv?: boolean;
+  has_female_toilet?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_diaper_changing_station?: boolean;
+  has_disabled_male_toilet?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_disabled_toilet?: boolean;
+  has_disabled_female_toilet?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -30,10 +30,15 @@ export class ToiletFilterDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_male_toilet?: boolean;
+  has_cctv?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
-  has_female_toilet?: boolean;
+  has_emergency_bell?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  has_diaper_changing_station?: boolean;
 }
