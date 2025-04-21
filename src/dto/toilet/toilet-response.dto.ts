@@ -21,3 +21,8 @@ export class ToiletMapResponseDto {
   @ApiProperty({ type: [ToiletSummaryDto] })
   toilets: ToiletSummaryDto[];
 }
+
+export class ToiletMapResponseWrapperDto {
+  @ApiProperty({ type: [ToiletMapResponseDto] })
+  groups: ToiletMapResponseDto[];
+}

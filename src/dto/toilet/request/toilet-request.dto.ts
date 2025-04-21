@@ -1,8 +1,13 @@
-import { IsOptional, IsBoolean, IsNumber } from 'class-validator';
+import {
+  IsOptional,
+  IsBoolean,
+  IsNumber,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
-export class ToiletRequestDto {
+export class ToiletBoundsDto {
   @ApiProperty()
   @Type(() => Number)
   @IsNumber()
@@ -32,44 +37,58 @@ export class ToiletRequestDto {
   @Type(() => Number)
   @IsNumber()
   right: number;
+}
 
-  @ApiProperty({ required: false })
+export class ToiletFilterDto {
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_male_toilet?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_female_toilet?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_disabled_male_toilet?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_disabled_female_toilet?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_kids_toilet?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_cctv?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_emergency_bell?: boolean;
 
-  @ApiProperty({ required: false })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   has_diaper_changing_station?: boolean;
+}
+
+export class ToiletMapRequestDto {
+  @ApiProperty({ type: ToiletBoundsDto })
+  @ValidateNested()
+  @Type(() => ToiletBoundsDto)
+  bounds: ToiletBoundsDto;
+
+  @ApiProperty({ type: ToiletFilterDto })
+  @ValidateNested()
+  @Type(() => ToiletFilterDto)
+  filters: ToiletFilterDto;
 }

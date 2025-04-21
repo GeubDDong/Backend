@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { FavoritesService } from 'src/favorite/favorites.service';
 import { RedisService } from 'src/cache/redis.service';
-import { ToiletMapResponseDto } from 'src/dto/toilet/toilet-response.dto';
+import {
+  ToiletMapResponseDto,
+  ToiletMapResponseWrapperDto,
+  ToiletSummaryDto,
+} from 'src/dto/toilet/toilet-response.dto';
 import { ToiletRepository } from './toilet.repository';
-import { ToiletFilterDto } from 'src/dto/toilet/request/toilet-filter.dto';
+import { ToiletMapRequestDto } from 'src/dto/toilet/request/toilet-request.dto';
 
 @Injectable()
 export class ToiletService {
@@ -14,24 +18,20 @@ export class ToiletService {
   ) {}
 
   async getToilets(
-    cenLat: number,
-    cenLng: number,
-    top: number,
-    bottom: number,
-    left: number,
-    right: number,
+    request: ToiletMapRequestDto,
     userSocialId?: string,
-    filters?: ToiletFilterDto,
-  ): Promise<{ groups: ToiletMapResponseDto[] }> {
+  ): Promise<ToiletMapResponseWrapperDto> {
+    const { bounds, filters } = request;
+    const { cenLat, cenLng, top, bottom, left, right } = bounds;
+
     const filterKey = Object.entries(filters || {})
       .filter(([, v]) => v !== undefined)
       .map(([k, v]) => `${k}=${v}`)
       .join('|');
 
     const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userSocialId || 'public'}:filters:${filterKey}`;
-    const cached = await this.redisService.get<{
-      groups: ToiletMapResponseDto[];
-    }>(cacheKey);
+    const cached =
+      await this.redisService.get<ToiletMapResponseWrapperDto>(cacheKey);
 
     if (cached) {
       return cached;
@@ -49,14 +49,10 @@ export class ToiletService {
 
     const toiletDtos = await Promise.all(
       toilets.map(async (toilet) => {
-        let isLiked = false;
-        if (userSocialId) {
-          const result = await this.favoritesService.getLiked(
-            toilet.id,
-            userSocialId,
-          );
-          isLiked = result.like;
-        }
+        const isLiked = userSocialId
+          ? (await this.favoritesService.getLiked(toilet.id, userSocialId)).like
+          : false;
+
         return {
           id: toilet.id,
           name: toilet.name,
@@ -67,7 +63,23 @@ export class ToiletService {
       }),
     );
 
+    const groupedToilets = this.groupToiletsByMarker(toiletDtos);
+    const response: ToiletMapResponseWrapperDto = {
+      groups: groupedToilets,
+    };
+
+    await this.redisService.set(cacheKey, response, 300);
+    return response;
+  }
+
+  private groupToiletsByMarker(
+    toiletDtos: (ToiletSummaryDto & {
+      marker_latitude: number;
+      marker_longitude: number;
+    })[],
+  ): ToiletMapResponseDto[] {
     const grouped: Record<string, ToiletMapResponseDto> = {};
+
     for (const toilet of toiletDtos) {
       const key = `${toilet.marker_latitude}-${toilet.marker_longitude}`;
 
@@ -78,6 +90,7 @@ export class ToiletService {
           toilets: [],
         };
       }
+
       grouped[key].toilets.push({
         id: toilet.id,
         name: toilet.name,
@@ -85,10 +98,6 @@ export class ToiletService {
       });
     }
 
-    const response = {
-      groups: Object.values(grouped),
-    };
-    await this.redisService.set(cacheKey, response, 300);
-    return response;
+    return Object.values(grouped);
   }
 }
