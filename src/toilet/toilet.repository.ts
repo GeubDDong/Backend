@@ -36,6 +36,17 @@ export class ToiletRepository {
       .andWhere('toilet.longitude BETWEEN :left AND :right', { left, right })
       .setParameters({ cenLat, cenLng });
 
+    this.FilterConditions(qb, filters);
+
+    return await qb.orderBy('distance', 'ASC').getMany();
+  }
+
+  private FilterConditions(
+    qb: ReturnType<Repository<Toilet>['createQueryBuilder']>,
+    filters?: ToiletFilterDto,
+  ) {
+    if (!filters) return;
+
     if (filters?.has_cctv === true) {
       qb.andWhere(`facility.cctv = 'Y'`);
     }
@@ -48,11 +59,12 @@ export class ToiletRepository {
       qb.andWhere(`facility.diaper_changing_station = 'Y'`);
     }
 
-    if (filters?.has_disabled_toilet === true) {
-      qb.andWhere(`(
-        facility.disabled_male_toilet > 0 OR
-        facility.disabled_female_toilet > 0
-      )`);
+    if (filters?.has_disabled_male_toilet === true) {
+      qb.andWhere(`facility.disabled_male_toilet > 0`);
+    }
+
+    if (filters?.has_disabled_female_toilet === true) {
+      qb.andWhere(`facility.disabled_female_toilet > 0`);
     }
 
     if (filters?.has_kids_toilet === true) {
@@ -69,8 +81,6 @@ export class ToiletRepository {
     if (filters?.has_female_toilet === true) {
       qb.andWhere(`facility.female_toilet > 0`);
     }
-
-    return await qb.orderBy('distance', 'ASC').getMany();
   }
 
   async findOneByToiletId(id: number): Promise<Toilet | null> {
