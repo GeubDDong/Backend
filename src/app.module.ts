@@ -8,7 +8,7 @@ import { CommentModule } from './comment/comment.module';
 import { UsersModule } from './user/user.module';
 import { ExcelModule } from './excel/excel.module';
 import { ToiletModule } from './toilet/toilet.module';
-import { Favorite } from './entity/favorite.entity';
+import { OauthModule } from './oauth/oauth.module';
 
 @Module({
   imports: [
@@ -20,6 +20,7 @@ import { Favorite } from './entity/favorite.entity';
     UsersModule,
     ExcelModule,
     ToiletModule,
+    OauthModule,
   ],
 })
 export class AppModule {}
