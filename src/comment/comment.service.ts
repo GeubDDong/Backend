@@ -114,7 +114,6 @@ export class CommentService {
       accessibility: number;
     },
   ): Promise<CommentEntity> {
-    // 유저 검증
     const user = await this.usersRepository.findBySocialId(socialId);
 
     if (!user) {
@@ -123,7 +122,6 @@ export class CommentService {
 
     const userId = user.id;
 
-    // 유저 화장실의 댓글 확인
     const existingComment =
       await this.commentsRepository.findCommentByUsersToiletId(
         toiletId,
@@ -158,7 +156,6 @@ export class CommentService {
 
     const userId = user.id;
 
-    // 유저 화장실의 댓글 확인
     const existingComment =
       await this.commentsRepository.findCommentByUsersToiletId(
         toiletId,

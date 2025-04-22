@@ -51,14 +51,14 @@ export class AuthService {
         socialId: existUser.social_id,
         isNewUser: false,
       };
+    } else {
+      const newUser = await this.usersService.createUser(user);
+      return {
+        user: { ...newUser },
+        socialId: newUser.social_id,
+        isNewUser: true,
+      };
     }
-
-    const newUser = await this.usersService.createUser(user);
-    return {
-      user: { ...newUser },
-      socialId: newUser.social_id,
-      isNewUser: true,
-    };
   }
 
   async validateUserBySocialId(socialId: string) {
@@ -74,6 +74,7 @@ export class AuthService {
     const payload: AuthJwtPayload = { socialId: socialId };
     return this.jwtService.signAsync(payload);
   }
+
   async validateRefreshToken(socialId: string, refreshToken: string) {
     const user = await this.usersService.getAuthPayloadBySocialId(socialId);
     if (!user || !user.refresh_token)
