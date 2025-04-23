@@ -12,6 +12,14 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  app.use((req, res, next) => {
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+    } else {
+      next();
+    }
+  });
+
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.enableCors({

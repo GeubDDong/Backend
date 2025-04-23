@@ -8,7 +8,9 @@ import {
 } from 'typeorm';
 import { Comment } from 'src/entity/comment.entity';
 import { Toilet } from 'src/entity/toilet.entity';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 @EventSubscriber()
 export class CommentSubscriber implements EntitySubscriberInterface<Comment> {
   constructor(connection: Connection) {

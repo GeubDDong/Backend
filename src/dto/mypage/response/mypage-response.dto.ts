@@ -55,9 +55,6 @@ export class MyReviewDto {
 
   @ApiProperty()
   updated_at: Date;
-
-  @ApiProperty()
-  isMine: boolean;
 }
 
 export class MyPageResponseDto {

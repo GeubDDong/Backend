@@ -9,6 +9,9 @@ import { UsersModule } from './user/user.module';
 import { ExcelModule } from './excel/excel.module';
 import { ToiletModule } from './toilet/toilet.module';
 import { OauthModule } from './oauth/oauth.module';
+import { MypageController } from './mypage/mypage.controller';
+import { MypageService } from './mypage/mypage.service';
+import { MypageModule } from './mypage/mypage.module';
 
 @Module({
   imports: [
@@ -21,6 +24,9 @@ import { OauthModule } from './oauth/oauth.module';
     ExcelModule,
     ToiletModule,
     OauthModule,
+    MypageModule,
   ],
+  controllers: [MypageController],
+  providers: [MypageService],
 })
 export class AppModule {}
