@@ -23,7 +23,7 @@ export class User {
   @Column({ type: 'varchar', length: 30, nullable: true })
   nickname: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   profile_image: string;
 
   @Column({ type: 'varchar', length: 10 })
