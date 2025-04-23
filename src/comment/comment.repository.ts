@@ -13,22 +13,9 @@ export class CommentsRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findCommentsPublic(toiletId: number): Promise<any> {
+  async findCommentsByToiletId(toiletId: number): Promise<any> {
     const comments = await this.commentRepository.find({
       where: { toilet: { id: toiletId }, deleted: false },
-      relations: ['user'],
-    });
-
-    return comments;
-  }
-
-  async findCommentsBySocialId(toiletId: number, socialId: string) {
-    const comments = await this.commentRepository.find({
-      where: {
-        toilet: { id: toiletId },
-        user: { social_id: socialId },
-        deleted: false,
-      },
       relations: ['user'],
     });
 

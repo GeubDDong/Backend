@@ -18,7 +18,8 @@ export class CommentService {
     const cached = await this.redisService.get(cacheKey);
     if (cached) return cached;
 
-    const comments = await this.commentsRepository.findCommentsPublic(toiletId);
+    const comments =
+      await this.commentsRepository.findCommentsByToiletId(toiletId);
 
     if (!comments.length) {
       return { statusCode: 200, message: '등록된 댓글이 없습니다.' };
@@ -47,7 +48,7 @@ export class CommentService {
 
     const [user, comments] = await Promise.all([
       this.usersRepository.findBySocialId(socialId),
-      this.commentsRepository.findCommentsBySocialId(toiletId, socialId),
+      this.commentsRepository.findCommentsByToiletId(toiletId),
     ]);
 
     if (!user) {
