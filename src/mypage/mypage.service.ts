@@ -12,6 +12,7 @@ export class MypageService {
   constructor(private readonly mypageRepository: MypageRepository) {}
 
   async getMyPage(userSocialId: string): Promise<MyPageResponseDto> {
+    console.log(userSocialId);
     if (!userSocialId) {
       throw new NotFoundException('회원 정보가 없습니다.');
     }

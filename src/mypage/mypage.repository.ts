@@ -53,7 +53,7 @@ export class MypageRepository {
           'id', t.id,
           'name', t.name
         ) AS toilet
-      FROM reviews r
+      FROM comments r
       JOIN users u ON u.id = r.user_id
       JOIN toilets t ON t.id = r.toilet_id
       WHERE u.social_id = $1

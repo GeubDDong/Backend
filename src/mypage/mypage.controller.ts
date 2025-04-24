@@ -10,10 +10,10 @@ import { Request } from 'express';
 export class MypageController {
   constructor(private readonly myPageService: MypageService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
   @ApiResponse({ status: 200, type: MyPageResponseDto })
   getMyPage(@Req() req: Request): Promise<MyPageResponseDto> {
+    console.log(req.user);
     return this.myPageService.getMyPage(req.user.socialId);
   }
 }

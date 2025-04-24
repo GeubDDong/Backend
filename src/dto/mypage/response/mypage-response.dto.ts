@@ -14,6 +14,12 @@ export class MyFavoriteToiletDto {
   lot_address: string;
 
   @ApiProperty()
+  latitude: number;
+
+  @ApiProperty()
+  longitude: number;
+
+  @ApiProperty()
   avg_cleanliness: number;
 
   @ApiProperty()
@@ -23,12 +29,18 @@ export class MyFavoriteToiletDto {
   avg_accessibility: number;
 }
 
-export class ReviewToiletInfoDto {
+export class MyReviewToiletInfoDto {
   @ApiProperty()
   id: number;
 
   @ApiProperty()
   name: string;
+
+  @ApiProperty()
+  latitude: number;
+
+  @ApiProperty()
+  longitude: number;
 }
 
 export class MyReviewDto {
@@ -36,19 +48,19 @@ export class MyReviewDto {
   id: number;
 
   @ApiProperty()
-  toilet: ReviewToiletInfoDto;
-
-  @ApiProperty()
-  profile_image: string;
-
-  @ApiProperty()
-  nickname: string;
+  toilet: MyReviewToiletInfoDto;
 
   @ApiProperty()
   comment: string;
 
   @ApiProperty()
-  avg_rating: number;
+  avg_cleanliness: number;
+
+  @ApiProperty()
+  avg_amenities: number;
+
+  @ApiProperty()
+  avg_accessibility: number;
 
   @ApiProperty()
   created_at: Date;
