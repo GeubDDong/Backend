@@ -22,7 +22,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: AuthJwtPayload) {
-    console.log(payload);
     if (!payload || !payload.socialId) {
       throw new UnauthorizedException('Invalid access token');
     }
@@ -31,7 +30,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       payload.socialId,
     );
 
-    console.log(user);
     return user;
   }
 }

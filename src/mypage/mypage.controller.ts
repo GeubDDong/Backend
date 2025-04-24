@@ -7,6 +7,7 @@ import { Request } from 'express';
 
 @ApiTags('MyPage')
 @Controller('mypage')
+@UseGuards(JwtAuthGuard)
 export class MypageController {
   constructor(private readonly myPageService: MypageService) {}
 

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { MypageRepository } from './mypage.repository';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -12,9 +16,8 @@ export class MypageService {
   constructor(private readonly mypageRepository: MypageRepository) {}
 
   async getMyPage(userSocialId: string): Promise<MyPageResponseDto> {
-    console.log(userSocialId);
     if (!userSocialId) {
-      throw new NotFoundException('회원 정보가 없습니다.');
+      throw new UnauthorizedException('회원 정보가 없습니다.');
     }
 
     const favorites =
