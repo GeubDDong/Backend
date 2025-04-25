@@ -32,6 +32,6 @@ import { CommentSubscriber } from './comment.subscriber';
     UsersRepository,
     CommentSubscriber,
   ],
-  exports: [CommentsRepository],
+  exports: [CommentsRepository, CommentSubscriber],
 })
 export class CommentModule {}

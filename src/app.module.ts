@@ -9,9 +9,19 @@ import { UsersModule } from './user/user.module';
 import { ExcelModule } from './excel/excel.module';
 import { ToiletModule } from './toilet/toilet.module';
 import { OauthModule } from './oauth/oauth.module';
+import { MypageController } from './mypage/mypage.controller';
+import { MypageService } from './mypage/mypage.service';
+import { MypageModule } from './mypage/mypage.module';
+import { JwtStrategy } from './util/strategy/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
+import jwtConfig from './configs/auth/jwt.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [jwtConfig],
+    }),
     TypeOrmModule.forRoot(typeORMConfig),
     DetailToiletModule,
     FavoritesModule,
@@ -21,6 +31,9 @@ import { OauthModule } from './oauth/oauth.module';
     ExcelModule,
     ToiletModule,
     OauthModule,
+    MypageModule,
   ],
+  controllers: [],
+  providers: [JwtStrategy],
 })
 export class AppModule {}

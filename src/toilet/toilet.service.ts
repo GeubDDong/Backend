@@ -5,7 +5,7 @@ import {
   ToiletMapResponseDto,
   ToiletMapResponseWrapperDto,
   ToiletSummaryDto,
-} from 'src/dto/toilet/toilet-response.dto';
+} from 'src/dto/toilet/response/toilet-response.dto';
 import { ToiletRepository } from './toilet.repository';
 import { ToiletMapRequestDto } from 'src/dto/toilet/request/toilet-request.dto';
 
