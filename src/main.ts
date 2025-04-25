@@ -12,6 +12,13 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+  });
+
   app.use((req, res, next) => {
     if (req.method === 'OPTIONS') {
       res.sendStatus(204);
@@ -21,13 +28,6 @@ async function bootstrap() {
   });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-
-  app.enableCors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
-  });
 
   const config = new DocumentBuilder()
     .setTitle('GeubDDong')
