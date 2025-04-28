@@ -13,10 +13,12 @@ import { CommentsRepository } from './comment.repository';
 import { User } from 'src/entity/user.entity';
 import { UsersRepository } from 'src/user/user.repository';
 import { CommentSubscriber } from './comment.subscriber';
+import { DetailToiletRepository } from 'src/detailToilet/detail.toilet.repository';
+import { Toilet } from 'src/entity/toilet.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Comment, User]),
+    TypeOrmModule.forFeature([Comment, User, Toilet]),
     ConfigModule.forFeature(jwtConfig),
     AuthModule,
   ],
@@ -30,6 +32,7 @@ import { CommentSubscriber } from './comment.subscriber';
     },
     CommentsRepository,
     UsersRepository,
+    DetailToiletRepository,
     CommentSubscriber,
   ],
   exports: [CommentsRepository, CommentSubscriber],

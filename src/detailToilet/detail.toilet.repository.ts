@@ -24,4 +24,28 @@ export class DetailToiletRepository {
 
     return result;
   }
+
+  async findRatingList(toiletId: number): Promise<any> {
+    const result = await this.detailToiletRepository.findOne({
+      select: [
+        'id',
+        'avg_rating',
+        'avg_cleanliness',
+        'avg_amenities',
+        'avg_accessibility',
+      ],
+      where: { id: toiletId },
+    });
+
+    if (!result) {
+      throw new NotFoundException('화장실을 찾을 수 없습니다.');
+    }
+
+    return {
+      avg_rating: result.avg_rating,
+      avg_cleanliness: result.avg_cleanliness,
+      avg_amenities: result.avg_amenities,
+      avg_accessibility: result.avg_accessibility,
+    };
+  }
 }

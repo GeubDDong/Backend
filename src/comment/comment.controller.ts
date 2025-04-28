@@ -58,6 +58,12 @@ export class CommentController {
       example: {
         statusCode: 201,
         message: 'comment created successfully',
+        data: {
+          avg_rating: 4.3,
+          avg_cleanliness: 4.5,
+          avg_amenities: 4.0,
+          avg_accessibility: 4.5,
+        },
       },
     },
   })
@@ -69,9 +75,18 @@ export class CommentController {
     const { socialId } = req.user;
     const { comment, rating } = createCommentDto;
 
-    await this.CommentService.addComment(toiletId, socialId, comment, rating);
+    const ratingList = await this.CommentService.addComment(
+      toiletId,
+      socialId,
+      comment,
+      rating,
+    );
 
-    return { statusCode: 201, message: 'comment created successfully' };
+    return {
+      statusCode: 201,
+      message: 'comment created successfully',
+      data: ratingList,
+    };
   }
 
   @Put(':toiletId')
@@ -85,6 +100,12 @@ export class CommentController {
       example: {
         statusCode: 200,
         message: 'comment updated successfully',
+        data: {
+          avg_rating: 4.3,
+          avg_cleanliness: 4.5,
+          avg_amenities: 4.0,
+          avg_accessibility: 4.5,
+        },
       },
     },
   })
@@ -97,7 +118,7 @@ export class CommentController {
 
     const { commentId, comment, rating } = updateCommentDto;
 
-    await this.CommentService.updateComment(
+    const ratingList = await this.CommentService.updateComment(
       toiletId,
       socialId,
       commentId,
@@ -105,7 +126,11 @@ export class CommentController {
       rating,
     );
 
-    return { statusCode: 200, message: 'comment updated successfully' };
+    return {
+      statusCode: 200,
+      message: 'comment updated successfully',
+      data: ratingList,
+    };
   }
 
   @Delete(':toiletId')
@@ -119,6 +144,12 @@ export class CommentController {
       example: {
         statusCode: 200,
         message: 'comment deleted successfully',
+        data: {
+          avg_rating: 4.3,
+          avg_cleanliness: 4.5,
+          avg_amenities: 4.0,
+          avg_accessibility: 4.5,
+        },
       },
     },
   })
@@ -129,8 +160,16 @@ export class CommentController {
   ) {
     const { socialId } = req.user;
 
-    await this.CommentService.removeComment(socialId, commentId, toiletId);
+    const ratingList = await this.CommentService.removeComment(
+      socialId,
+      commentId,
+      toiletId,
+    );
 
-    return { statusCode: 201, message: 'comment removed successfully' };
+    return {
+      statusCode: 201,
+      message: 'comment removed successfully',
+      data: ratingList,
+    };
   }
 }

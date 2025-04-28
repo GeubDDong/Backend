@@ -4,6 +4,7 @@ import { CommentsRepository } from './comment.repository';
 import { Comment as CommentEntity } from '../entity/comment.entity';
 import { UsersRepository } from 'src/user/user.repository';
 import { RatingDto } from 'src/dto/comment/create.comment.dto';
+import { DetailToiletRepository } from 'src/detailToilet/detail.toilet.repository';
 
 @Injectable()
 export class CommentService {
@@ -11,6 +12,7 @@ export class CommentService {
     // private readonly redisService: RedisService,
     private readonly commentsRepository: CommentsRepository,
     private readonly usersRepository: UsersRepository,
+    private readonly detailToiletRepository: DetailToiletRepository,
   ) {}
 
   async getCommentsPublic(toiletId: number): Promise<any> {
@@ -95,16 +97,19 @@ export class CommentService {
 
     const userId = user.id;
 
-    const saved = await this.commentsRepository.createComment(
+    await this.commentsRepository.createComment(
       userId,
       toiletId,
       comment,
       rating,
     );
 
+    const ratingList =
+      await this.detailToiletRepository.findRatingList(toiletId);
+
     // await this.invalidateCommentCache(toiletId);
 
-    return saved;
+    return ratingList;
   }
 
   async updateComment(
@@ -138,13 +143,13 @@ export class CommentService {
     }
 
     existingComment.comment = comment;
-    const updated = await this.commentsRepository.updateComment(
-      existingComment,
-      rating,
-    );
+    await this.commentsRepository.updateComment(existingComment, rating);
+
+    const ratingList =
+      await this.detailToiletRepository.findRatingList(toiletId);
 
     // await this.invalidateCommentCache(existingComment.toilet.id, userId);
-    return updated;
+    return ratingList;
   }
 
   async removeComment(
@@ -171,12 +176,14 @@ export class CommentService {
       throw new NotFoundException(`${commentId}번 댓글을 찾을 수 없습니다.`);
     }
 
-    const removed =
-      await this.commentsRepository.removeComment(existingComment);
+    await this.commentsRepository.removeComment(existingComment);
+
+    const ratingList =
+      await this.detailToiletRepository.findRatingList(toiletId);
 
     // await this.invalidateCommentCache(toiletId, userId);
 
-    return removed;
+    return ratingList;
   }
 
   // private async invalidateCommentCache(toiletId: number, userId?: number) {
