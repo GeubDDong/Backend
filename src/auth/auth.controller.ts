@@ -27,7 +27,20 @@ export class AuthController {
   ) {
     const socialId = req.user.socialId;
 
-    await this.authService.generateAccessToken(socialId);
+    const accessToken = await this.authService.generateAccessToken(socialId);
+    const refreshToken = await this.authService.generateRefreshToken(socialId);
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
 
     return {
       statusCode: 201,

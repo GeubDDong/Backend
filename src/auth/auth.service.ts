@@ -67,12 +67,18 @@ export class AuthService {
 
     return {
       socialId: user.social_id,
+      id: user.id,
     };
   }
 
   async generateAccessToken(socialId: string) {
     const payload: AuthJwtPayload = { socialId: socialId };
     return this.jwtService.signAsync(payload);
+  }
+
+  async generateRefreshToken(socialId: string) {
+    const payload: AuthJwtPayload = { socialId };
+    return this.jwtService.signAsync(payload, { expiresIn: '14d' });
   }
 
   async validateRefreshToken(socialId: string, refreshToken: string) {
