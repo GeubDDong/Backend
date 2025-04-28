@@ -30,13 +30,13 @@ export class RefreshJwtStrategy extends PassportStrategy(
   }
 
   async validate(req: Request, payload: AuthJwtPayload) {
-    const userId = payload.socialId;
+    const socialId = payload.socialId;
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
       throw new UnauthorizedException('리프레시 토큰이 없습니다.');
     }
 
-    return await this.authService.validateRefreshToken(userId, refreshToken);
+    return await this.authService.validateRefreshToken(socialId, refreshToken);
   }
 }
