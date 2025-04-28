@@ -43,7 +43,7 @@ services:
     ports:
       - '9187:9187'
     environment:
-      DATA_SOURCE_NAME: 'postgresql://postgres:postgres!!@database-posgresql.c9skg8qqi6y3.ap-northeast-2.rds.amazonaws.com:5432/postgres?sslmode=disable'
+      - DATA_SOURCE_NAME=${POSTGRES_EXPORTER_DATA_SOURCE_NAME}
     restart: always
     networks:
       - app_network
