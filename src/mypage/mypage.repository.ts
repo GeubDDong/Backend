@@ -52,6 +52,7 @@ export class MypageRepository {
       .innerJoinAndSelect('comment.toilet', 'toilet')
       .innerJoin('comment.user', 'user')
       .where('user.social_id = :socialId', { socialId })
+      .andWhere('comment.deleted=false')
       .select([
         'comment.id AS id',
         'comment.comment AS comment',
