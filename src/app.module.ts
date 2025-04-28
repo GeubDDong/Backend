@@ -23,7 +23,6 @@ import { PrometheusModule } from '@willsoto/nestjs-prometheus';
       isGlobal: true,
       load: [jwtConfig],
     }),
-    PrometheusModule.register(),
     TypeOrmModule.forRoot(typeORMConfig),
     DetailToiletModule,
     FavoritesModule,
