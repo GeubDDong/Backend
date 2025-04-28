@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   backend-app:
     image: kinyura/geubddong
@@ -67,13 +69,6 @@ services:
     restart: always
     networks:
       - app_network
-
-  scrape_configs:
-    - job_name: 'backend-app-prod'
-      scheme: https
-      metrics_path: /metrics
-      static_configs:
-        - targets: ['geubddong.com:443']
 
 networks:
   app_network:
