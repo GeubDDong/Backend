@@ -116,4 +116,18 @@ export class FavoritesService {
   // this.redisService.del(publicKey),
   // ]);
   // }
+  async findLikedToiletIds(
+    socialId: string,
+    toiletIds: number[],
+  ): Promise<number[]> {
+    const user = await this.usersRepository.findBySocialId(socialId);
+    if (!user) {
+      return [];
+    }
+    const likedRecords = await this.favoritesRepository.findLikedToiletsByIds(
+      toiletIds,
+      user.id,
+    );
+    return likedRecords.map((record) => record.toilet_id);
+  }
 }

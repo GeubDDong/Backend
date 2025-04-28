@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { FavoritesService } from 'src/favorite/favorites.service';
-// import { RedisService } from 'src/cache/redis.service';
 import {
   ToiletMapResponseDto,
   ToiletMapResponseWrapperDto,
@@ -14,7 +13,6 @@ export class ToiletService {
   constructor(
     private readonly toiletRepository: ToiletRepository,
     private readonly favoritesService: FavoritesService,
-    // private readonly redisService: RedisService,
   ) {}
 
   async getToilets(
@@ -23,19 +21,6 @@ export class ToiletService {
   ): Promise<ToiletMapResponseWrapperDto> {
     const { bounds, filters } = request;
     const { cenLat, cenLng, top, bottom, left, right } = bounds;
-
-    const filterKey = Object.entries(filters || {})
-      .filter(([, v]) => v !== undefined)
-      .map(([k, v]) => `${k}=${v}`)
-      .join('|');
-
-    // const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userSocialId || 'public'}:filters:${filterKey}`;
-    // const cached =
-    // await this.redisService.get<ToiletMapResponseWrapperDto>(cacheKey);
-
-    // if (cached) {
-    // return cached;
-    // }
 
     const toilets = await this.toiletRepository.findToiletsInBounds(
       cenLat,
@@ -47,29 +32,24 @@ export class ToiletService {
       filters,
     );
 
-    const toiletDtos = await Promise.all(
-      toilets.map(async (toilet) => {
-        const isLiked = userSocialId
-          ? (await this.favoritesService.getLiked(toilet.id, userSocialId)).like
-          : false;
+    const toiletIds = toilets.map((toilet) => toilet.id);
 
-        return {
-          id: toilet.id,
-          name: toilet.name,
-          is_liked: isLiked,
-          marker_latitude: Number(toilet.latitude.toFixed(4)),
-          marker_longitude: Number(toilet.longitude.toFixed(4)),
-        };
-      }),
-    );
+    // 만약 user가 로그인한 경우, 내가 좋아요한 화장실 ID 리스트를 가져온다
+    const likedToiletIds = userSocialId
+      ? await this.favoritesService.findLikedToiletIds(userSocialId, toiletIds)
+      : [];
+
+    const toiletDtos = toilets.map((toilet) => ({
+      id: toilet.id,
+      name: toilet.name,
+      is_liked: likedToiletIds.includes(toilet.id),
+      marker_latitude: Number(toilet.latitude.toFixed(4)),
+      marker_longitude: Number(toilet.longitude.toFixed(4)),
+    }));
 
     const groupedToilets = this.groupToiletsByMarker(toiletDtos);
-    const response: ToiletMapResponseWrapperDto = {
-      groups: groupedToilets,
-    };
 
-    // await this.redisService.set(cacheKey, response, 300);
-    return response;
+    return { groups: groupedToilets };
   }
 
   private groupToiletsByMarker(
