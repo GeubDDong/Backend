@@ -67,8 +67,7 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - GF_SERVER_ROOT_URL=https://geubddong.com/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_ROOT_URL=/grafana/
     restart: always
     networks:
       - app_network
