@@ -15,6 +15,7 @@ import { MypageModule } from './mypage/mypage.module';
 import { JwtStrategy } from './util/strategy/jwt.strategy';
 import { ConfigModule } from '@nestjs/config';
 import jwtConfig from './configs/auth/jwt.config';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import jwtConfig from './configs/auth/jwt.config';
       isGlobal: true,
       load: [jwtConfig],
     }),
+    PrometheusModule.register(),
     TypeOrmModule.forRoot(typeORMConfig),
     DetailToiletModule,
     FavoritesModule,
