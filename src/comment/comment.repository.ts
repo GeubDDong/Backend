@@ -41,6 +41,7 @@ export class CommentsRepository {
         id: commentId,
         user: { id: userId },
         toilet: { id: toiletId },
+        deleted: false,
       },
       relations: ['user', 'toilet'],
     });
@@ -66,7 +67,7 @@ export class CommentsRepository {
 
   async removeComment(existingComment: Comment): Promise<Comment> {
     const comment = await this.commentRepository.findOne({
-      where: { id: existingComment.id },
+      where: { id: existingComment.id, deleted: false },
       relations: ['toilet'],
     });
 
