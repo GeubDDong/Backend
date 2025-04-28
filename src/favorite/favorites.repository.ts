@@ -41,15 +41,4 @@ export class FavoriteRepository {
 
     await favoriteRepo.delete({ user, toilet });
   }
-  async findLikedToiletsByIds(
-    toiletIds: number[],
-    userId: number,
-  ): Promise<{ toilet_id: number }[]> {
-    return this.favoritesRepository
-      .createQueryBuilder('favorite')
-      .select('favorite.toilet_id')
-      .where('favorite.user_id = :userId', { userId })
-      .andWhere('favorite.toilet_id IN (:...toiletIds)', { toiletIds })
-      .getRawMany();
-  }
 }
