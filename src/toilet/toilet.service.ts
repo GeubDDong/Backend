@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FavoritesService } from 'src/favorite/favorites.service';
-import { RedisService } from 'src/cache/redis.service';
+// import { RedisService } from 'src/cache/redis.service';
 import {
   ToiletMapResponseDto,
   ToiletMapResponseWrapperDto,
@@ -14,7 +14,7 @@ export class ToiletService {
   constructor(
     private readonly toiletRepository: ToiletRepository,
     private readonly favoritesService: FavoritesService,
-    private readonly redisService: RedisService,
+    // private readonly redisService: RedisService,
   ) {}
 
   async getToilets(
@@ -29,13 +29,13 @@ export class ToiletService {
       .map(([k, v]) => `${k}=${v}`)
       .join('|');
 
-    const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userSocialId || 'public'}:filters:${filterKey}`;
-    const cached =
-      await this.redisService.get<ToiletMapResponseWrapperDto>(cacheKey);
+    // const cacheKey = `toilets:${cenLat}:${cenLng}:${top}:${bottom}:${left}:${right}:${userSocialId || 'public'}:filters:${filterKey}`;
+    // const cached =
+    // await this.redisService.get<ToiletMapResponseWrapperDto>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
+    // if (cached) {
+    // return cached;
+    // }
 
     const toilets = await this.toiletRepository.findToiletsInBounds(
       cenLat,
@@ -68,7 +68,7 @@ export class ToiletService {
       groups: groupedToilets,
     };
 
-    await this.redisService.set(cacheKey, response, 300);
+    // await this.redisService.set(cacheKey, response, 300);
     return response;
   }
 

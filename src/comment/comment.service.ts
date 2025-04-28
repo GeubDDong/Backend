@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { RedisService } from 'src/cache/redis.service';
+// import { RedisService } from 'src/cache/redis.service';
 import { CommentsRepository } from './comment.repository';
 import { Comment as CommentEntity } from '../entity/comment.entity';
 import { UsersRepository } from 'src/user/user.repository';
@@ -8,15 +8,15 @@ import { RatingDto } from 'src/dto/comment/create.comment.dto';
 @Injectable()
 export class CommentService {
   constructor(
-    private readonly redisService: RedisService,
+    // private readonly redisService: RedisService,
     private readonly commentsRepository: CommentsRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
   async getCommentsPublic(toiletId: number): Promise<any> {
-    const cacheKey = `comments:public:toilet:${toiletId}`;
-    const cached = await this.redisService.get(cacheKey);
-    if (cached) return cached;
+    // const cacheKey = `comments:public:toilet:${toiletId}`;
+    // const cached = await this.redisService.get(cacheKey);
+    // if (cached) return cached;
 
     const comments =
       await this.commentsRepository.findCommentsByToiletId(toiletId);
@@ -37,14 +37,14 @@ export class CommentService {
       })),
     };
 
-    await this.redisService.set(cacheKey, result, 300);
+    // await this.redisService.set(cacheKey, result, 300);
     return result;
   }
 
   async getComments(toiletId: number, socialId: string): Promise<any> {
-    const cacheKey = `comments:user:${socialId}:toilet:${toiletId}`;
-    const cached = await this.redisService.get(cacheKey);
-    if (cached) return cached;
+    // const cacheKey = `comments:user:${socialId}:toilet:${toiletId}`;
+    // const cached = await this.redisService.get(cacheKey);
+    // if (cached) return cached;
 
     const [user, comments] = await Promise.all([
       this.usersRepository.findBySocialId(socialId),
@@ -74,7 +74,7 @@ export class CommentService {
       })),
     };
 
-    await this.redisService.set(cacheKey, result, 300);
+    // await this.redisService.set(cacheKey, result, 300);
     return result;
   }
 
@@ -99,7 +99,7 @@ export class CommentService {
       rating,
     );
 
-    await this.invalidateCommentCache(toiletId);
+    // await this.invalidateCommentCache(toiletId);
 
     return saved;
   }
@@ -140,7 +140,7 @@ export class CommentService {
       rating,
     );
 
-    await this.invalidateCommentCache(existingComment.toilet.id, userId);
+    // await this.invalidateCommentCache(existingComment.toilet.id, userId);
     return updated;
   }
 
@@ -171,14 +171,14 @@ export class CommentService {
     const removed =
       await this.commentsRepository.removeComment(existingComment);
 
-    await this.invalidateCommentCache(toiletId, userId);
+    // await this.invalidateCommentCache(toiletId, userId);
 
     return removed;
   }
 
-  private async invalidateCommentCache(toiletId: number, userId?: number) {
-    const pattern = `comments:${userId ? `user:${userId}:` : 'public:'}toilet:${toiletId}`;
-    const keys = await this.redisService.scanKeys(pattern);
-    await Promise.all(keys.map((key) => this.redisService.del(key)));
-  }
+  // private async invalidateCommentCache(toiletId: number, userId?: number) {
+  //   const pattern = `comments:${userId ? `user:${userId}:` : 'public:'}toilet:${toiletId}`;
+  //   const keys = await this.redisService.scanKeys(pattern);
+  //   await Promise.all(keys.map((key) => this.redisService.del(key)));
+  // }
 }

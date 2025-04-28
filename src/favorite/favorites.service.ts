@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { RedisService } from 'src/cache/redis.service';
+// import { RedisService } from 'src/cache/redis.service';
 import { FavoriteRepository } from './favorites.repository';
 import { UsersRepository } from 'src/user/user.repository';
 import { ToiletRepository } from 'src/toilet/toilet.repository';
@@ -14,17 +14,17 @@ export class FavoritesService {
     private readonly favoritesRepository: FavoriteRepository,
     private readonly usersRepository: UsersRepository,
     private readonly toiletsRepository: ToiletRepository,
-    private readonly redisService: RedisService,
+    // private readonly redisService: RedisService,
   ) {}
 
   async getLiked(toiletId: number, socialId: string) {
-    const cacheKey = `favorite:user:${socialId}:toilet:${toiletId}`;
-    const cached = await this.redisService.get<{
-      like: boolean;
-      count: number;
-    }>(cacheKey);
+    // const cacheKey = `favorite:user:${socialId}:toilet:${toiletId}`;
+    // const cached = await this.redisService.get<{
+    // like: boolean;
+    // count: number;
+    // }>(cacheKey);
 
-    if (cached) return cached;
+    // if (cached) return cached;
 
     const user = await this.usersRepository.findBySocialId(socialId);
 
@@ -39,7 +39,7 @@ export class FavoritesService {
       like: !!hasLiked,
     };
 
-    await this.redisService.set(cacheKey, result, 60);
+    // await this.redisService.set(cacheKey, result, 60);
     return result;
   }
 
@@ -69,7 +69,7 @@ export class FavoritesService {
       throw new ConflictException('이미 좋아요를 추가한 화장실입니다.');
     }
 
-    await this.invalidateCache(socialId, toiletId);
+    // await this.invalidateCache(socialId, toiletId);
 
     return await this.favoritesRepository.createLike(user, toilet);
   }
@@ -102,18 +102,18 @@ export class FavoritesService {
       );
     }
 
-    await this.invalidateCache(socialId, toiletId);
+    // await this.invalidateCache(socialId, toiletId);
 
     return await this.favoritesRepository.deleteLike(user, toilet);
   }
 
-  private async invalidateCache(socialId: string, toiletId: number) {
-    const userKey = `favorite:user:${socialId}:toilet:${toiletId}`;
-    const publicKey = `favorite:public:toilet:${toiletId}`;
+  // private async invalidateCache(socialId: string, toiletId: number) {
+  //   const userKey = `favorite:user:${socialId}:toilet:${toiletId}`;
+  //   const publicKey = `favorite:public:toilet:${toiletId}`;
 
-    await Promise.all([
-      this.redisService.del(userKey),
-      this.redisService.del(publicKey),
-    ]);
-  }
+  // await Promise.all([
+  // this.redisService.del(userKey),
+  // this.redisService.del(publicKey),
+  // ]);
+  // }
 }
