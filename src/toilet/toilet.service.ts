@@ -68,7 +68,7 @@ export class ToiletService {
       groups: groupedToilets,
     };
 
-    // await this.redisService.set(cacheKey, response, 300);
+    await this.redisService.set(cacheKey, response, 300);
     return response;
   }
 
