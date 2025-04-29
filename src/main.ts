@@ -16,7 +16,8 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+    allowedHeaders:
+      'Origin,X-Requested-With,Content-Type,Accept,Authorization,Cookie',
   });
 
   app.use((req, res, next) => {
