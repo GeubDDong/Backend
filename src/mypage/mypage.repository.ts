@@ -34,9 +34,9 @@ export class MypageRepository {
         'toilet.lot_address AS lot_address',
         'toilet.latitude AS latitude',
         'toilet.longitude AS longitude',
-        'ROUND(AVG(comment.rating_cleanliness), 1) AS avg_cleanliness',
-        'ROUND(AVG(comment.rating_amenities), 1) AS avg_amenities',
-        'ROUND(AVG(comment.rating_accessibility), 1) AS avg_accessibility',
+        'ROUND(AVG(comment.rating_cleanliness), 1)::float8 AS avg_cleanliness',
+        'ROUND(AVG(comment.rating_amenities), 1)::float8 AS avg_amenities',
+        'ROUND(AVG(comment.rating_accessibility), 1)::float8 AS avg_accessibility',
       ])
       .whereInIds(toiletIds)
       .groupBy('toilet.id')
