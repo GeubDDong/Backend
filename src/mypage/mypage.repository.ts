@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Toilet } from 'src/entity/toilet.entity';
-import { User } from 'src/entity/user.entity';
 import { Favorite } from 'src/entity/favorite.entity';
 import { Comment } from 'src/entity/comment.entity';
 
@@ -27,7 +26,7 @@ export class MypageRepository {
 
     return this.dataSource
       .createQueryBuilder(Toilet, 'toilet')
-      .leftJoin('toilet.comments', 'comment')
+      .leftJoin('toilet.comments', 'comment', 'comment.deleted = false')
       .select([
         'toilet.id AS id',
         'toilet.name AS name',
