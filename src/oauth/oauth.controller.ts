@@ -25,12 +25,16 @@ export class OauthController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
     });
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
     });
 
     return {
