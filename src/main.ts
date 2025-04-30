@@ -12,6 +12,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
+  //app.급똥.com
   app.enableCors({
     origin: [
       'https://geubddong-deploy.vercel.app',
