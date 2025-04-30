@@ -34,12 +34,16 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
     });
 
     return {
