@@ -58,8 +58,20 @@ export class AuthController {
 
     const { statusCode, message } = await this.authService.logout(socialId);
 
-    res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
+    });
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: '.geubddong.com',
+      path: '/',
+    });
 
     return { statusCode, message };
   }
